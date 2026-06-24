@@ -1,0 +1,985 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Anidaso Jobs - Real Jobs, Checked For You</title>
+<meta name="description" content="Job listings curated and checked by a real person, plus scam alerts, for job seekers in Ghana.">
+
+<style>
+  /* ====================================================
+     FONTS
+     Fraunces -> warm humanist serif for headlines (hope, not bureaucracy)
+     Inter     -> body text
+     JetBrains Mono -> labels, dates, the "verified" tag
+     ==================================================== */
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap');
+
+  :root{
+    --clay: #8B4226;
+    --clay-soft: #A8593A;
+    --gold: #E8A33D;
+    --green: #2C5F45;
+    --green-soft: #DCEBE2;
+    --paper: #FBF6EE;
+    --paper-line: #EDE3D1;
+    --ink: #2B2420;
+    --ink-soft: #5C4F44;
+    --white: #FFFFFF;
+    --warn: #B3261E;
+    --warn-soft: #FBEAE8;
+    /* New subtle backdrop tone — sits behind the page, never behind
+       header/nav/footer text, so the writing areas keep full contrast */
+    --backdrop: #F3EEDF;
+  }
+
+  *{ margin:0; padding:0; box-sizing:border-box; }
+  html{ scroll-behavior:smooth; font-size:17px; }
+
+  body{
+    background: var(--backdrop);
+    color: var(--ink);
+    font-family: 'Inter', sans-serif;
+    line-height: 1.55;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  .inner{ max-width: 720px; margin:0 auto; padding: 0 24px; background: var(--paper); }
+  a{ color:inherit; text-decoration:none; }
+  h1,h2,h3{ font-family:'Fraunces', serif; color:var(--clay); }
+
+  .eyebrow{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:var(--green);
+  }
+
+  /* ---------- HEADER ---------- */
+  header{ padding:24px 0; display:flex; align-items:center; }
+  .brand-name{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:1.65rem;
+    color:var(--clay);
+    cursor:pointer;
+  }
+  .brand-name span{ color:var(--green); }
+  .quicklinks{
+    margin-left:auto;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.72rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+  }
+  .quicklinks a{ color:var(--ink-soft); margin-left:16px; }
+  .quicklinks a:first-child{ margin-left:0; }
+  @media (max-width:520px){ .quicklinks{ display:none; } }
+
+  /* ---------- HERO ---------- */
+  .hero{ padding: 36px 0 30px; border-bottom: 1px solid var(--paper-line); }
+  .hero h1{
+    font-size: 2.3rem;
+    line-height:1.1;
+    font-weight:700;
+    margin: 8px 0 14px;
+    max-width: 16ch;
+  }
+  .hero p.lede{
+    font-size:1.04rem;
+    color:var(--ink-soft);
+    max-width:48ch;
+    margin-bottom: 22px;
+  }
+  .hero-stats{
+    display:flex;
+    margin-top:18px;
+    flex-wrap:wrap;
+  }
+  .hero-stats > div{ margin-right:28px; }
+  .hero-stats > div:last-child{ margin-right:0; }
+  .stat-num{ font-family:'Fraunces', serif; font-weight:700; font-size:1.6rem; color:var(--clay); }
+  .stat-label{ font-family:'JetBrains Mono', monospace; font-size:0.68rem; color:var(--ink-soft); text-transform:uppercase; }
+
+  section{ padding: 36px 0; }
+  .divider{ display:flex; align-items:center; margin: 0 0 22px; }
+  .divider .line{ margin-left:14px; }
+  .divider .line{ flex:1; height:1px; background: var(--paper-line); }
+
+  /* ---------- SCAM ALERT BANNER ---------- */
+  /* Deliberately styled distinctly from job cards — warm/warning tones,
+     so it can never be mistaken for a real opportunity at a glance. */
+  .scam-banner{
+    background: var(--warn-soft);
+    border: 1.4px solid var(--warn);
+    border-radius:14px;
+    padding: 16px 18px;
+    margin-bottom: 26px;
+  }
+  .scam-banner .scam-head{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.74rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color:var(--warn);
+    font-weight:600;
+    margin-bottom:8px;
+  }
+  .scam-banner p{ font-size:0.9rem; color:var(--ink); }
+  .scam-banner ul{ margin:8px 0 0 18px; font-size:0.88rem; color:var(--ink-soft); }
+  .scam-banner li{ margin-bottom:4px; }
+
+  /* ---------- JOB CARDS ---------- */
+  .job-card{
+    background: var(--white);
+    border: 1px solid var(--paper-line);
+    border-radius: 16px;
+    padding: 20px 22px;
+    margin-bottom: 14px;
+    position:relative;
+    cursor: pointer;
+    transition: box-shadow 0.18s ease, border-color 0.18s ease;
+  }
+  .job-card:hover{
+    border-color: var(--clay-soft);
+    box-shadow: 0 4px 14px rgba(43,36,32,0.08);
+  }
+  .job-top{ display:flex; justify-content:space-between; align-items:flex-start; gap:12px; }
+  .job-title{ font-family:'Fraunces', serif; font-weight:600; font-size:1.12rem; color:var(--ink); }
+  .job-company{ font-size:0.9rem; color:var(--ink-soft); margin-top:2px; }
+
+  /* The signature trust badge — small, consistent, on every checked listing */
+  .verified-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.62rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--green);
+    background: var(--green-soft);
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+    flex-shrink:0;
+  }
+  .verified-badge::before{ content:"✓"; font-weight:700; }
+
+  .job-meta{
+    display:flex;
+    flex-wrap:wrap;
+    margin:10px 0 12px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.74rem;
+    color:var(--ink-soft);
+  }
+  .job-meta span{ margin-right:16px; margin-bottom:4px; display:inline-block; }
+  .job-meta span:last-child{ margin-right:0; }
+  .job-meta .job-location{ color: var(--clay); font-weight:500; }
+
+  /* short teaser line, always visible */
+  .job-desc{ font-size:0.92rem; color:var(--ink-soft); margin-bottom:14px; }
+
+  /* full description — hidden until the job title is clicked */
+  .job-full{
+    display:none;
+    font-size:0.92rem;
+    color:var(--ink);
+    white-space:pre-line;
+    background: var(--paper);
+    border-left: 3px solid var(--green);
+    padding: 12px 14px;
+    border-radius: 8px;
+    margin-bottom: 14px;
+  }
+  .job-full strong{
+    font-family:'Fraunces', serif;
+    color: var(--clay);
+    font-weight:700;
+  }
+  .job-card.is-open .job-full{ display:block; }
+  .job-card.is-open .job-desc{ display:none; }
+
+  .job-title{ cursor:pointer; }
+  .job-title:hover{ color: var(--clay); }
+  .expand-hint{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.66rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color: var(--green);
+    margin-top:4px;
+  }
+
+  .job-actions{ display:flex; flex-wrap:wrap; position:relative; z-index:2; }
+  .job-actions .btn{ margin-right:10px; margin-bottom:8px; }
+
+  .btn{
+    display:inline-flex; align-items:center; gap:6px;
+    padding: 10px 18px;
+    font-family:'Inter', sans-serif;
+    font-weight:600;
+    font-size:0.88rem;
+    border-radius:4px;
+    border: none;
+    cursor:pointer;
+    transition: transform 0.15s ease;
+  }
+  .btn-primary{ background: var(--clay); color: var(--white); }
+  .btn-primary:hover{ transform: translateY(-1px); background: var(--clay-soft); }
+  .btn-ghost{ background: transparent; color: var(--ink-soft); border: 1.2px solid var(--paper-line); }
+  .btn-ghost:hover{ border-color: var(--ink-soft); }
+
+  .btn-hero{
+    padding: 13px 22px;
+    font-size:0.92rem;
+  }
+
+  /* ---------- HELP STRIP ---------- */
+  .help-strip{
+    background: var(--clay);
+    color: var(--white);
+    border-radius:16px;
+    padding: 22px 22px;
+    text-align:center;
+    margin-top: 30px;
+  }
+  .help-strip h3{ color: var(--white); font-size:1.15rem; margin-bottom:6px; }
+  .help-strip p{ color:#F2DCC9; font-size:0.9rem; margin-bottom:16px; }
+  .help-strip .btn-primary{ background: var(--gold); color: var(--ink); }
+
+  footer{
+    padding: 24px 0 40px;
+    text-align:center;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.7rem;
+    color:var(--ink-soft);
+  }
+  footer a{ color:var(--clay); text-decoration:underline; }
+
+  .empty-state{
+    text-align:center;
+    padding: 30px 20px;
+    color: var(--ink-soft);
+    font-size:0.92rem;
+    border: 1px dashed var(--paper-line);
+    border-radius:14px;
+  }
+
+  /* ---------- PAGINATION ---------- */
+  .pagination{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    flex-wrap:wrap;
+    margin-top: 22px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+  }
+  .pagination button{
+    background: var(--white);
+    border: 1.2px solid var(--paper-line);
+    color: var(--ink-soft);
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    margin: 0 4px 8px;
+    cursor:pointer;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    transition: border-color 0.15s ease, color 0.15s ease;
+  }
+  .pagination button:hover{ border-color: var(--clay-soft); color: var(--clay); }
+  .pagination button.is-active{
+    background: var(--clay);
+    border-color: var(--clay);
+    color: var(--white);
+  }
+  .pagination button.nav-arrow{ font-family:'Inter', sans-serif; font-weight:700; }
+  .pagination button:disabled{ opacity:0.35; cursor:default; }
+
+  @media (max-width:520px){
+    .hero h1{ font-size:1.85rem; max-width:none; }
+    .job-top{ flex-direction:column; }
+    .verified-badge{ margin-top:6px; }
+  }
+
+  :focus-visible{ outline: 2px solid var(--green); outline-offset:2px; }
+
+  /* ---------- BACK TO TOP ---------- */
+  .back-to-top{
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: var(--clay);
+    color: var(--white);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    font-size: 1.2rem;
+    border:none;
+    cursor:pointer;
+    box-shadow: 0 4px 14px rgba(43,36,32,0.25);
+    opacity:0;
+    visibility:hidden;
+    transition: opacity 0.25s ease, transform 0.15s ease;
+    z-index: 50;
+  }
+  .back-to-top.is-visible{ opacity:1; visibility:visible; }
+  .back-to-top:hover{ background: var(--clay-soft); transform: translateY(-2px); }
+</style>
+</head>
+<body>
+  <div id="top"></div>
+  <div class="inner">
+    <header>
+      <a href="#top" class="brand-name" id="topAnchor">Anidaso<span>Jobs</span></a>
+      <nav class="quicklinks">
+        <a href="#jobs">Jobs</a>
+        <a href="#scam-watch">Scam Watch</a>
+        <a href="#help">Get Help</a>
+      </nav>
+    </header>
+
+    <section class="hero">
+      <div class="eyebrow">Real Jobs. Checked For You.</div>
+      <h1>Hope, without the guesswork.</h1>
+      <p class="lede">Every listing here is found and checked by a real person before it's posted - so you spend your time applying, not wondering if it's a scam.</p>
+      <a class="btn btn-primary btn-hero" href="#jobs">See open jobs ↓</a>
+      <div class="hero-stats" id="heroStats">
+        <!-- filled in by script below, based on the job list -->
+      </div>
+    </section>
+
+    <section id="jobs">
+      <div class="divider"><span class="eyebrow">Open Listings</span><span class="line"></span></div>
+      <div id="jobList"><!-- job cards injected here by script --></div>
+      <div class="pagination" id="pagination"><!-- page controls injected by script --></div>
+    </section>
+
+    <section id="scam-watch">
+      <div class="divider"><span class="eyebrow">Scam Watch</span><span class="line"></span></div>
+      <div class="scam-banner">
+        <div class="scam-head">⚠ Patterns seen recently</div>
+        <p>If a "job" asks for any of the following, treat it as a serious warning sign:</p>
+        <ul id="scamList"><!-- injected by script --></ul>
+      </div>
+    </section>
+
+    <section id="help">
+      <div class="help-strip">
+        <h3>Let Us Enhance Your CV to Get The Job</h3>
+        <p>iDesign Services can upgrade your CV, write your SOP, or help with a scholarship application - so you apply with your strongest shot.</p>
+        <a class="btn btn-primary" href="https://wa.me/233208916616" target="_blank" rel="noopener">Message on WhatsApp →</a>
+      </div>
+      <!--
+        OPTIONAL: list your service rates here once you've shared them.
+        Example structure to paste your prices into:
+
+        <div class="job-card" style="margin-top:14px;">
+          <div class="job-title">CV Review & Polish</div>
+          <div class="job-desc">GHC ___ — short turnaround, tracked feedback.</div>
+        </div>
+      -->
+    </section>
+
+    <footer>
+      Anidaso Jobs · A Project By <a href="#" id="iDesignLink">iDesign Services</a> · Ghana
+    </footer>
+  </div>
+
+  <button class="back-to-top" id="backToTop" aria-label="Back to top" onclick="window.scrollTo({top:0, behavior:'smooth'})">↑</button>
+
+<script>
+  /* ============================================================
+     EDIT YOUR JOB LISTINGS HERE
+     ============================================================
+     This is the ONLY section you need to touch to add, edit, or
+     remove a job. Each job is one { ... } block below. Copy an
+     existing block, change the details, add a comma after it.
+
+     Fields:
+       title       - the job title
+       company     - company name (use "Reputable Company" if the
+                     posting itself doesn't name one — never invent
+                     a real company name that wasn't in the source)
+       location    - e.g. "Accra" or "Remote"
+       type        - e.g. "Full-time", "Part-time", "Contract"
+       salary      - e.g. "GHC 1,500 - 2,000" or "Not stated" if unknown
+       posted      - date you added it, e.g. "24 Jun 2026"
+       description - 1-2 honest sentences about the role (always visible,
+                     shown when the card is collapsed)
+       fullDescription - OPTIONAL. The complete job text. If you set this,
+                     clicking the job title expands the card to show it
+                     in full. Use \n for line breaks. Wrap a section label
+                     in double-asterisks to make it bold, e.g.
+                     "**Key Responsibilities:**\n" — renders bold, the
+                     rest of that line stays normal text. Leave this field
+                     out (or set to "") if "description" already says
+                     everything.
+       applyLink   - where to apply (a real URL, or "mailto:..." ). When
+                     a job has a fullDescription, the Apply button always
+                     opens the card first so the visitor reads the full
+                     details before clicking through — applyLink is what
+                     it goes to from there (or just keep it on the card
+                     as a "Got it, where do I send my CV" link, see
+                     job-actions-full below).
+       verified    - true / false — only mark true once YOU have
+                     personally checked the source is real
+     ============================================================ */
+  var jobs = [
+    {
+      title: "District Business Development Lead",
+      company: "Talent Scout GH",
+      location: "Afram Plains",
+      type: "Full-time",
+      salary: "GHS 2,000 - 3,000 + commission",
+      posted: "24 Jun 2026",
+      description: "Lead district-level revenue growth, client acquisition, and partnerships for a growing organization.",
+      fullDescription:
+        "Lead the District. Grow the Business. Build Your Future.\n\n" +
+        "Join a growing organization and play a key role in expanding market presence, acquiring clients and driving revenue growth across the Afram Plains District.\n\n" +
+        "**Key Responsibilities:**\n" +
+        "- Generate revenue and achieve sales targets\n" +
+        "- Acquire new clients and expand market share\n" +
+        "- Build strategic partnerships and stakeholder relationships\n" +
+        "- Identify and develop new business opportunities\n" +
+        "- Manage key accounts and drive customer retention\n" +
+        "- Represent the organization across the district\n" +
+        "- Lead market expansion initiatives\n\n" +
+        "**Requirements:**\n" +
+        "- Bachelor's Degree in Business, Marketing, Sales or a related field\n" +
+        "- Minimum 3 years' experience in Business Development, Sales or a related role\n" +
+        "- Proven record of exceeding sales targets\n" +
+        "- Strong negotiation and relationship management skills\n" +
+        "- Must reside in Afram Plains District or be willing to relocate\n" +
+        "- Valid driver's licence is an advantage\n\n" +
+        "**Ideal Candidates:** Business Development Managers, Regional Sales Managers, Territory Managers, Area Sales Managers, Relationship Managers, Key Account Managers, Corporate Sales Executives, Commercial Officers, Sales Executives.\n\n" +
+        "**To Apply:** Send your CV and required information to info@talentscoutgh.com or WhatsApp 0205106406.",
+      applyLink: "mailto:info@talentscoutgh.com",
+      verified: true
+    },
+    {
+      title: "Personal Assistant & Assistant Accountant",
+      company: "Elite Choice Company Limited",
+      location: "Accra",
+      type: "Office Work",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Support daily admin operations and financial record-keeping in a single combined PA/accounting role.",
+      fullDescription:
+        "Join our team and be part of innovating the future of mobility.\n\n" +
+        "Application deadline: Open until filled.\n\n" +
+        "**Requirements:**\n" +
+        "- A Bachelor's Degree or HND in Administration\n" +
+        "- 1-2 years of proven experience as a P.A\n" +
+        "- Highly organised, detail-driven, multitasker\n" +
+        "- Proficiency in MS Office + Google Workspace\n" +
+        "- Excellent communication + confidentiality\n" +
+        "- Proactive & thrives under pressure\n\n" +
+        "**Responsibilities:**\n" +
+        "- Manage schedules and appointments\n" +
+        "- Handle emails, calls, and correspondence\n" +
+        "- Organize meetings and office records\n" +
+        "- Prepare reports and documents\n" +
+        "- Support daily administrative operations\n" +
+        "- Record financial transactions\n" +
+        "- Prepare invoices and receipts\n" +
+        "- Maintain financial records\n" +
+        "- Reconcile accounts and bank statements\n" +
+        "- Assist with payroll and financial reporting\n\n" +
+        "**To Apply:** Send your CV and other documents to elitechoicelogistics1@gmail.com. For more information, WhatsApp 0593319087.",
+      applyLink: "mailto:elitechoicelogistics1@gmail.com",
+      verified: true
+    },
+    {
+      title: "Househelp (Live-in)",
+      company: "Private Household",
+      location: "Spintex - Baatsona, Accra",
+      type: "Live-in, Full-time",
+      salary: "GHS 700 - 900 + meals & accommodation",
+      posted: "24 Jun 2026",
+      description: "A young couple is looking for a live-in househelp to support cleaning, laundry, meals, and occasional childcare.",
+      fullDescription:
+        "A young couple is looking for a Househelp.\n\n" +
+        "- Young lady\n" +
+        "- Christian\n" +
+        "- Age range: 19-27\n" +
+        "- Speaks and understands some level of English and Twi\n\n" +
+        "**Job Description:**\n" +
+        "- Sweeping (both indoors and outdoors)\n" +
+        "- Mopping\n" +
+        "- Dusting\n" +
+        "- Cleaning washrooms, bathrooms and bedrooms\n" +
+        "- Washing (utensils, clothes — both hand wash and washing machine)\n" +
+        "- Ironing\n" +
+        "- Engage and play with kids when necessary\n" +
+        "- Required to attend church every Sunday with the family\n" +
+        "- Heating kids' meals and feeding them when necessary\n" +
+        "- Assisting with preparation of meals\n\n" +
+        "**Salary:** GHS 700 - 900. Meals provided by home. Live-in help.\n" +
+        "**Location:** Spintex, Baatsona.\n\n" +
+        "**To Apply:** For more information, contact Pearl on 0504990295",
+      applyLink: "#",
+      verified: false
+    },
+    {
+      title: "Credit Analyst",
+      company: "Talent Scout GH",
+      location: "Mallam and its environs",
+      type: "Full-time",
+      salary: "Competitive (not stated)",
+      posted: "24 Jun 2026",
+      description: "Analyze credit risk and assess loan applications for a financial services client in the Mallam area.",
+      fullDescription:
+        "**Key Role:** Analyze credit risk and assess loan applications.\n\n" +
+        "**Requirements:** Relevant degree or professional qualification.\n\n" +
+        "**What We Offer:** Very competitive salary and great career growth.\n\n" +
+        "**To Apply:** Click the link below to apply directly, or call/WhatsApp 0243 966 248. Send your CV to info@talentscoutgh.com.",
+      applyLink: "https://talentscoutgh.com/job/talent-scout-full-time-credit-analyst/",
+      verified: true
+    },
+    {
+      title: "Operations Manager",
+      company: "Reputable Company",
+      location: "Kumasi",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Lead operations for a marketing firm in Kumasi — requires a relevant degree and 3-5 years of marketing-firm experience.",
+      fullDescription:
+        "Operations Manager urgently needed in Kumasi.\n\n" +
+        "**Requirements:**\n" +
+        "- Degree in Accounting, Marketing, Management, Supply Chain, or Logistics\n" +
+        "- A background in Law is a plus\n" +
+        "- 3-5 years' experience in a marketing firm\n" +
+        "- Must know how to drive\n\n" +
+        "**To Apply:** Send your CV / contact 0544047442.",
+      applyLink: "tel:0544047442",
+      verified: false
+    },
+    {
+      title: "Senior Human Resource & Administration Officer",
+      company: "The Green Belt Movement (GBM)",
+      location: "Accra",
+      type: "Full-time, On-site",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Lead HR and administration functions, operational efficiency, and policy compliance for an environmental NGO.",
+      fullDescription:
+        "**Employer:** The Green Belt Movement (GBM).\n" +
+        "**Location:** Accra, Ghana.\n" +
+        "**Job Type:** Full-time, On-site.\n" +
+        "**Application Deadline:** June 26, 2026.\n\n" +
+        "**Role requires leadership in:**\n" +
+        "- HR and administration functions\n" +
+        "- Operational efficiency\n" +
+        "- Compliance with labour laws\n" +
+        "- Alignment with organizational strategy and values\n\n" +
+        "**Responsibilities:**\n" +
+        "- Lead and manage the organization's human resources and administrative functions\n" +
+        "- Ensure operational efficiency\n" +
+        "- Ensure compliance with applicable labour laws\n" +
+        "- Ensure alignment with organizational strategy and values\n\n" +
+        "**To Apply:** Submit a single document containing your cover letter and CV (do not attach certificates) with the subject line \"Senior HR and Administration Officer Application\" to jobs@greenbeltmovement.org. Only shortlisted candidates will be contacted.\n\n" +
+        "Note: the original posting referenced Kenyan labour law while listing Accra, Ghana as the location — likely a multi-country template not fully updated for this role. Worth confirming directly with GBM before applying.",
+      applyLink: "mailto:jobs@greenbeltmovement.org",
+      verified: true
+    },
+    {
+      title: "Chinese Translator & Personal Assistant",
+      company: "Not stated",
+      location: "Accra",
+      type: "Not stated",
+      salary: "GHS 5,000 - 8,000",
+      posted: "24 Jun 2026",
+      description: "Chinese translator who can also drive and handle basic personal assistant duties.",
+      fullDescription:
+        "Chinese Translator Needed.\n\n" +
+        "Looking for a Chinese Translator who can also drive and assist with basic Personal Assistant duties.\n\n" +
+        "**Salary:** GH₵5,000 – GH₵8,000.\n\n" +
+        "**To Apply:** Call/WhatsApp 020 177 7022.\n\n" +
+        "Note: no company name was given in the original posting, and contact is WhatsApp-only — worth verifying who you're actually speaking to before sharing any documents or personal details.",
+      applyLink: "#",
+      verified: false
+    },
+    {
+      title: "Human Resource Officer",
+      company: "CERATH Development Organization (CERATH)",
+      location: "Accra",
+      type: "Full-time, On-site",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Support recruitment, onboarding, and HR documentation for a development organization. Open until filled.",
+      fullDescription:
+        "**Employer:** CERATH Development Organization (CERATH).\n" +
+        "**Location:** Accra, Ghana.\n" +
+        "**Job Type:** Full-Time, On-site.\n" +
+        "**Application Deadline:** Open until filled.\n\n" +
+        "**Requirements:**\n" +
+        "- Bachelor's Degree in Human Resource Management or a related field\n" +
+        "- At least 1-2 years' relevant HR experience (advantage)\n" +
+        "- Good communication and interpersonal skills\n" +
+        "- Strong organizational and administrative abilities\n" +
+        "- Proficiency in Microsoft Office applications\n" +
+        "- Ability to maintain confidentiality and work with minimal supervision\n\n" +
+        "**Responsibilities:**\n" +
+        "- Support recruitment and selection processes\n" +
+        "- Maintain employee records and HR documentation\n" +
+        "- Coordinate staff onboarding, training, and performance management activities\n" +
+        "- Assist in implementing HR policies and procedures\n" +
+        "- Prepare HR reports and ensure compliance with labor regulations\n" +
+        "- Handle employee relations matters and provide administrative support to staff\n\n" +
+        "**To Apply:** Send your CV and cover letter with the subject line \"Application for Human Resource Officer Position\" to info@cerathdev.org.",
+      applyLink: "mailto:info@cerathdev.org",
+      verified: false
+    },
+    {
+      title: "Senior Programs & Performance Officer",
+      company: "Her Initiative",
+      location: "Not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Join Her Initiative's team as Senior Programs & Performance Officer. Apply via the link before the deadline.",
+      fullDescription:
+        "**We Are Hiring!** Join our team.\n\n" +
+        "**Role:** Senior Programs & Performance Officer.\n\n" +
+        "**Deadline:** 3rd July, 2026.\n\n" +
+        "**To Apply:** Apply through https://kaziconnect.co.tz/\n\n" +
+        "Note: the application link is a .co.tz (Tanzania) domain for an organization called Her Initiative — worth double-checking the role's actual base location and legitimacy before applying.",
+      applyLink: "https://kaziconnect.co.tz/",
+      verified: false
+    },
+    {
+      title: "Maintenance Officer",
+      company: "Broll Ghana",
+      location: "Airport City, Accra",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Handle preventive maintenance, equipment installation, and routine building upkeep for a property management firm.",
+      fullDescription:
+        "**Division:** Property Management.\n" +
+        "**Reporting To:** Operations Manager.\n" +
+        "**Job Location:** Airport City, Accra.\n\n" +
+        "**Position Purpose:** Responsible for the maintenance of the building. Completes preventive maintenance, installs new equipment, and assists with routine building maintenance. Completes work order records and files all related maintenance paperwork. Assists area staff as required, responds to maintenance needs, and keeps management well informed.\n\n" +
+        "**Summary Responsibilities:**\n" +
+        "- Continuously checks and inspects buildings to identify maintenance needs\n" +
+        "- Responds promptly and efficiently to tenant maintenance requirements\n" +
+        "- Responds promptly and efficiently to duties allocated by the Centre Manager or Operations Manager\n" +
+        "- Checks all main outer and inner doors (broken glass, open and close properly etc.)\n" +
+        "- Checks exterior of buildings and identifies problem areas\n" +
+        "- Checks all fittings in toilets (taps, basins, urinals etc.)\n" +
+        "- Checks all equipment such as air-conditioning plant, standby pumps, sump pump, water tanks, water feature equipment etc.\n" +
+        "- Ensures familiarity with emergency equipment and procedures\n" +
+        "- Performs repairs where necessary and escalates to operations manager when required\n" +
+        "- Identifies daily maintenance issues, communicates with the operations manager, and schedules work accordingly\n" +
+        "- Inspects equipment, checks operating condition, and logs repair needs\n" +
+        "- Follows all safety rules and procedures; ensures compliance with legal regulations and OSHA requirements\n" +
+        "- Assumes responsibility for tenant installations: quality control checks, ensuring premises are satisfactory before move-in, assisting tenants on move-in, and assisting with removal/relocation of partitioning where necessary\n\n" +
+        "**To Apply:** Contact details were not shown on this flyer — check with Broll Ghana directly for the application channel.",
+      applyLink: "#",
+      verified: false
+    },
+    {
+      title: "Cashier / Wait Staff",
+      company: "CleanEats (Healthy Fast Food)",
+      location: "East Legon, Tema and its environs",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Customer-facing cashier and wait staff role for a healthy fast food brand. Applicant must live in East Legon or Tema area.",
+      fullDescription:
+        "**Requirements:**\n" +
+        "- SHS, Diploma, or HND in Accounting\n" +
+        "- Previous experience in a customer service or cashier role, preferably in the food service industry\n" +
+        "- Strong interpersonal and communication skills\n" +
+        "- Ability to handle transactions accurately and efficiently\n" +
+        "- Knowledge of basic math and cash handling procedures\n\n" +
+        "**Duties:**\n" +
+        "- Customer Service: greet customers warmly and provide prompt, courteous service\n" +
+        "- Assist customers in selecting menu items and offer recommendations based on preferences and dietary needs\n" +
+        "- Address customer inquiries and resolve issues or complaints efficiently and professionally\n\n" +
+        "Applicant must live in East Legon, Tema and its environs.\n\n" +
+        "**To Apply:** Send your cover letter and CV to hr@cleaneatsgh.com. More info: Cleaneatsgh.com/careers",
+      applyLink: "mailto:hr@cleaneatsgh.com",
+      verified: true
+    },
+    {
+      title: "Human Resources Administrator",
+      company: "CleanEats (Healthy Fast Food)",
+      location: "Tema and its environs",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Manage recruitment, onboarding, and employee records for a healthy fast food brand. Applicant must live in Tema area.",
+      fullDescription:
+        "**Duties:**\n" +
+        "- Manage the recruitment process\n" +
+        "- Manage the onboarding process for new hires\n" +
+        "- Maintain accurate and confidential employee records\n" +
+        "- Assist in resolving employee issues and conflicts, promoting a positive workplace culture through effective communication and mediation\n\n" +
+        "**Qualification:**\n" +
+        "- Bachelor's degree in Human Resources, Business Administration, or a related field\n" +
+        "- Minimum of 3 years' experience in human resources, preferably in the food service or retail industry\n" +
+        "- Strong knowledge of employment laws and regulations\n" +
+        "- Excellent organizational and multitasking skills, with strong attention to detail\n\n" +
+        "Applicant must live in Tema and its environs.\n\n" +
+        "**To Apply:** hr@cleaneatsgh.com. Website: www.cleaneatsgh.com/careers",
+      applyLink: "mailto:hr@cleaneatsgh.com",
+      verified: true
+    },
+    {
+      title: "Logistics Manager",
+      company: "Global Talent Masters (GTM), for a manufacturing client",
+      location: "Tema",
+      type: "Full-time",
+      salary: "GHC 14,500 - 20,000 + benefits",
+      posted: "24 Jun 2026",
+      description: "Plan, coordinate, and oversee distribution of finished goods for a manufacturing company in Tema. 8-10 years' FMCG logistics experience required.",
+      fullDescription:
+        "**Sector:** Manufacturing.\n\n" +
+        "**Job Overview:** Looking for a Logistics Manager to be responsible for planning, coordinating and overseeing the movement and distribution of finished goods in a timely and cost-efficient manner while maintaining quality and safety standards.\n\n" +
+        "**Responsibilities:**\n" +
+        "- Oversee outbound distribution of finished goods to distributors and customers\n" +
+        "- Coordinate transportation, liaise with transporters and negotiate rates\n" +
+        "- Monitor logistics costs and implement cost-saving initiatives\n" +
+        "- Ensure compliance with food safety, quality and regulatory requirements\n" +
+        "- Provide leadership and support to logistics staff\n" +
+        "- Liaise with internal teams (production, sales & finance) to optimize operations\n" +
+        "- Prepare logistics reports and performance metrics\n" +
+        "- Ensure site security; implement and monitor security protocols\n" +
+        "- Recruit, train, and supervise machine operators, technicians, and support staff\n" +
+        "- Implement performance reviews and training\n" +
+        "- Manage relationships with suppliers and cooperatives\n" +
+        "- Enforce compliance with environmental, health, and safety standards\n\n" +
+        "**Qualifications & Skills:**\n" +
+        "- Degree/Master's in Logistics, Supply Chain Management, or Business Administration\n" +
+        "- At least 8-10 years' experience managing logistics in an FMCG environment\n" +
+        "- Strong expertise in documentation and inland transport coordination\n" +
+        "- Experience managing transporters\n" +
+        "- Proficiency in MS Excel/ERP Systems\n\n" +
+        "**Salary Package:** Net salary of GHC 14,500 - 20,000, plus competitive benefits commensurate with experience.\n\n" +
+        "**Apply Before:** 30th June, 2026.\n\n" +
+        "**To Apply:** Email CV to ransford@globaltalentmasters.com or info@globaltalentmasters.com, or WhatsApp 0244 218 566.",
+      applyLink: "mailto:ransford@globaltalentmasters.com",
+      verified: true
+    },
+    {
+      title: "Digital Marketer & Content Strategist",
+      company: "Twinbrook Properties",
+      location: "Osu, Accra",
+      type: "Full-time, On-site",
+      salary: "Competitive (not stated)",
+      posted: "23 Jun 2026",
+      description: "Own the online presence for a real estate company in Osu — social, content, SEO, and analytics.",
+      fullDescription:
+        "Twinbrook Properties (Osu, Accra) is looking for a bold, creative Digital Marketer & Content Strategist to own our online presence.\n\n" +
+        "**Location:** Osu, Accra. On-site, Full-time.\n\n" +
+        "**You should be great at:**\n" +
+        "- Social media & paid ads\n" +
+        "- Content creation & strategy\n" +
+        "- SEO, email & analytics\n\n" +
+        "**To Apply:** Send your CV + portfolio to tclrecruitment2025@gmail.com. Only shortlisted candidates will be contacted.",
+      applyLink: "mailto:tclrecruitment2025@gmail.com",
+      verified: true
+    },
+    {
+      title: "",
+      company: "",
+      location: "",
+      type: "",
+      salary: "",
+      posted: "",
+      description: "",
+      fullDescription: "",
+      applyLink: "#",
+      verified: false
+    }
+    // Add more jobs here, following the same { ... }, format.
+  ];
+
+  /* ============================================================
+     EDIT YOUR SCAM-WATCH NOTES HERE
+     Keep these as short, pattern-level warnings, not links to
+     specific scam pages or contact details — the goal is to teach
+     recognition, not to send people anywhere risky.
+     ============================================================ */
+  var scamPatterns = [
+    "Asking you to pay money upfront for training, a uniform, or 'processing' before you've even been interviewed",
+    "Job offers that arrive only through WhatsApp or Telegram with no company website, address, or way to verify them",
+    "Interviews conducted entirely by text chat, with an offer made within minutes",
+    "Requests for your mobile money PIN, full ID number, or bank login 'to set up payroll' before you've started",
+    "Salaries that sound far above market rate for the stated role and qualifications"
+  ];
+
+  // ---- Helpers ----
+
+  // Converts "24 Jun 2026" style strings into a sortable timestamp.
+  // Falls back to 0 (oldest) if the date can't be parsed, so a typo
+  // never crashes the page — it just sorts that job to the bottom.
+  function parsePostedDate(str) {
+    var t = Date.parse(str);
+    return isNaN(t) ? 0 : t;
+  }
+
+  // Turns **text** into <strong>text</strong> so section labels like
+  // "**Key Responsibilities:**" render bold. Everything else in the
+  // description is left as plain text — this is intentionally simple,
+  // not a full markdown parser, so it stays predictable to edit.
+  function renderBold(text) {
+    return text.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>');
+  }
+
+  // How many job cards show per page.
+  var PAGE_SIZE = 5;
+  var currentPage = 1;
+
+  // ---- Render jobs ----
+  var jobListEl = document.getElementById('jobList');
+  var paginationEl = document.getElementById('pagination');
+
+  // Only real, filled-in jobs are considered for display/counts.
+  var realJobs = [];
+  for (var vi = 0; vi < jobs.length; vi++) {
+    if (jobs[vi].title) realJobs.push(jobs[vi]);
+  }
+
+  // Newest posted date first, so freshly added jobs always rise to the top.
+  realJobs.sort(function(a, b) {
+    return parsePostedDate(b.posted) - parsePostedDate(a.posted);
+  });
+
+  var verifiedCount = 0;
+  for (var ci = 0; ci < realJobs.length; ci++) {
+    if (realJobs[ci].verified) verifiedCount++;
+  }
+  var filledCount = realJobs.length;
+
+  function renderJobCard(job, indexKey) {
+    var badge = job.verified ? '<span class="verified-badge">Checked by us</span>' : '';
+    var waText = encodeURIComponent('Hi, I want help applying for: ' + job.title);
+    var hasFull = job.fullDescription && job.fullDescription.trim().length > 0;
+    var hint = hasFull ? '<div class="expand-hint">Tap title or Apply for full details ↓</div>' : '';
+    var fullBlock = hasFull ? '<div class="job-full">' + renderBold(job.fullDescription) + '</div>' : '';
+    var cardId = 'job-card-' + indexKey;
+
+    // If there's a full description, BOTH the title and the Apply button
+    // open the card first — a visitor should see everything before being
+    // sent off to an email/link/phone number. Once the card is open,
+    // Apply still works as the real outbound link (it just also expands
+    // the card on the way there, which is harmless and helps people not
+    // skip details).
+    var applyOnClick = hasFull
+      ? 'onclick="event.stopPropagation(); var c=document.getElementById(\'' + cardId + '\'); if(c \u0026\u0026 !c.classList.contains(\'is-open\')){ event.preventDefault(); toggleJobCard(\'' + cardId + '\'); }"'
+      : '';
+
+    return (
+      '<div class="job-card" id="' + cardId + '"' + (hasFull ? ' onclick="toggleJobCard(\'' + cardId + '\')"' : '') + '>' +
+        '<div class="job-top">' +
+          '<div>' +
+            '<div class="job-title">' + job.title + '</div>' +
+            '<div class="job-company">' + job.company + '</div>' +
+            hint +
+          '</div>' +
+          badge +
+        '</div>' +
+        '<div class="job-meta">' +
+          '<span class="job-location">📍 ' + job.location + '</span>' +
+          '<span>' + job.type + '</span>' +
+          '<span>' + job.salary + '</span>' +
+          '<span>Posted ' + job.posted + '</span>' +
+        '</div>' +
+        '<div class="job-desc">' + job.description + '</div>' +
+        fullBlock +
+        '<div class="job-actions" onclick="event.stopPropagation()">' +
+          '<a class="btn btn-primary" href="' + job.applyLink + '" target="_blank" rel="noopener" ' + applyOnClick + '>Apply →</a>' +
+          '<a class="btn btn-ghost" href="https://wa.me/233208916616?text=' + waText + '" target="_blank" rel="noopener">Get CV help first</a>' +
+        '</div>' +
+      '</div>'
+    );
+  }
+
+  function renderPage(page) {
+    var totalPages = Math.max(1, Math.ceil(filledCount / PAGE_SIZE));
+    currentPage = Math.min(Math.max(1, page), totalPages);
+
+    if (filledCount === 0) {
+      jobListEl.innerHTML = '<div class="empty-state">No listings right now — check back soon, or message iDesign Services on WhatsApp to ask what\'s coming up.</div>';
+      paginationEl.innerHTML = '';
+      return;
+    }
+
+    var start = (currentPage - 1) * PAGE_SIZE;
+    var pageJobs = realJobs.slice(start, start + PAGE_SIZE);
+
+    var jobHtml = '';
+    for (var i = 0; i < pageJobs.length; i++) {
+      jobHtml += renderJobCard(pageJobs[i], start + i);
+    }
+    jobListEl.innerHTML = jobHtml;
+
+    // ---- Pagination controls ----
+    var pagHtml = '';
+    pagHtml += '<button class="nav-arrow" onclick="goToPage(' + (currentPage - 1) + ')" ' + (currentPage === 1 ? 'disabled' : '') + '>‹</button>';
+    for (var p = 1; p <= totalPages; p++) {
+      pagHtml += '<button class="' + (p === currentPage ? 'is-active' : '') + '" onclick="goToPage(' + p + ')">' + p + '</button>';
+    }
+    pagHtml += '<button class="nav-arrow" onclick="goToPage(' + (currentPage + 1) + ')" ' + (currentPage === totalPages ? 'disabled' : '') + '>›</button>';
+    paginationEl.innerHTML = totalPages > 1 ? pagHtml : '';
+  }
+
+  // Jumps to a given page and scrolls back to the top of the listings,
+  // so paging through page 2, 3... doesn't leave you scrolled mid-page
+  // looking at a half-changed list.
+  function goToPage(page) {
+    renderPage(page);
+    var jobsSection = document.getElementById('jobs');
+    if (jobsSection) jobsSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  // Toggle a job card open/closed to reveal the full description
+  function toggleJobCard(id){
+    var card = document.getElementById(id);
+    if (card) card.classList.toggle('is-open');
+  }
+
+  renderPage(1);
+
+  // ---- Render hero stats ----
+  document.getElementById('heroStats').innerHTML =
+    '<div><div class="stat-num">' + filledCount + '</div><div class="stat-label">Open Listings</div></div>' +
+    '<div><div class="stat-num">' + verifiedCount + '</div><div class="stat-label">Personally Checked</div></div>';
+
+  // ---- Render scam watch list ----
+  var scamHtml = '';
+  for (var s = 0; s < scamPatterns.length; s++) {
+    scamHtml += '<li>' + scamPatterns[s] + '</li>';
+  }
+  document.getElementById('scamList').innerHTML = scamHtml;
+
+  // ---- Link to iDesign Services site (update this URL once both are live) ----
+  document.getElementById('iDesignLink').href = "https://wa.me/233208916616";
+
+  // ---- Back to top button visibility ----
+  var backToTopBtn = document.getElementById('backToTop');
+  window.addEventListener('scroll', function() {
+    if (window.scrollY > 400) {
+      backToTopBtn.classList.add('is-visible');
+    } else {
+      backToTopBtn.classList.remove('is-visible');
+    }
+  });
+</script>
+
+</body>
+</html>
