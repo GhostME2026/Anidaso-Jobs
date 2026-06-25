@@ -77,6 +77,67 @@
   .quicklinks a:first-child{ margin-left:0; }
   @media (max-width:520px){ .quicklinks{ display:none; } }
 
+  /* ---------- MOBILE MENU (hamburger) ---------- */
+  /* Hidden on desktop — the text quicklinks above handle that. On
+     narrow screens, this button shows instead and opens a small
+     dropdown with the same three links. */
+  .menu-toggle{
+    display:none;
+    margin-left:auto;
+    background: transparent;
+    border: 1.2px solid var(--paper-line);
+    border-radius:8px;
+    width:40px;
+    height:40px;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    flex-shrink:0;
+  }
+  .menu-toggle span{
+    display:block;
+    width:18px;
+    height:2px;
+    background: var(--clay);
+    position:relative;
+  }
+  .menu-toggle span::before, .menu-toggle span::after{
+    content:"";
+    position:absolute;
+    left:0;
+    width:18px;
+    height:2px;
+    background: var(--clay);
+  }
+  .menu-toggle span::before{ top:-6px; }
+  .menu-toggle span::after{ top:6px; }
+
+  .mobile-menu{
+    display:none;
+    flex-direction:column;
+    background: var(--white);
+    border: 1px solid var(--paper-line);
+    border-radius:12px;
+    padding: 8px;
+    margin: 0 0 18px;
+    box-shadow: 0 6px 20px rgba(43,36,32,0.1);
+  }
+  .mobile-menu.is-open{ display:flex; }
+  .mobile-menu a{
+    padding: 12px 14px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.78rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color: var(--ink-soft);
+    border-radius:8px;
+  }
+  .mobile-menu a:hover{ background: var(--paper); color: var(--clay); }
+
+  @media (max-width:520px){
+    .menu-toggle{ display:flex; }
+  }
+
   /* ---------- HERO ---------- */
   .hero{ padding: 36px 0 30px; border-bottom: 1px solid var(--paper-line); }
   .hero h1{
@@ -347,7 +408,13 @@
         <a href="#scam-watch">Scam Watch</a>
         <a href="#help">Get Help</a>
       </nav>
+      <button class="menu-toggle" id="menuToggle" aria-label="Open menu"><span></span></button>
     </header>
+    <nav class="mobile-menu" id="mobileMenu">
+      <a href="#jobs">Jobs</a>
+      <a href="#scam-watch">Scam Watch</a>
+      <a href="#help">Get Help</a>
+    </nav>
 
     <section class="hero">
       <div class="eyebrow">Real Jobs. Checked For You.</div>
@@ -1015,6 +1082,248 @@
       verified: true
     },
     {
+      title: "Graphic Designer",
+      company: "Agrokings",
+      location: "Not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "25 Jun 2026",
+      description: "Send your CV and cover letter to apply for this graphic design role.",
+      fullDescription:
+        "**To Apply:** Send your CV and cover letter to hr@agrokings.io.",
+      applyLink: "mailto:hr@agrokings.io",
+      verified: true
+    },
+    {
+      title: "Quality Assurance Officer",
+      company: "Nationwide Medical Insurance",
+      location: "Not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "25 Jun 2026",
+      description: "Monitor, evaluate, and enhance service quality across departments, ensuring compliance with regulations and customer service standards.",
+      fullDescription:
+        "**Position Summary:** The QA Officer will monitor, evaluate, and enhance service quality across departments, ensuring compliance with regulations, internal policies, and customer service standards.\n\n" +
+        "**Key Responsibilities:**\n" +
+        "- Monitor and evaluate customer service interactions to ensure compliance and service excellence\n" +
+        "- Monitor employees' engagement with health service providers based on established standards\n" +
+        "- Conduct regular audits of operational activities across the various departments\n" +
+        "- Conduct surveys on services provided by both the organization as well as its partners\n" +
+        "- Analyze data to identify trends and areas for improvement\n" +
+        "- Conduct debrief sessions for assigned departments based on the regular audits\n" +
+        "- Prepare and submit weekly reports based on audits and surveys conducted\n" +
+        "- Perform any other Quality Assurance related tasks that may be assigned from time to time\n\n" +
+        "**Qualifications and Requirements:**\n" +
+        "- Bachelor's degree in a relevant field (e.g. Quality Management, Insurance, Business, Law, IT)\n" +
+        "- 1-2 years' experience in a similar role, ideally in insurance\n" +
+        "- Strong analytical, communication, report-writing, and problem-solving skills with keen attention to detail\n" +
+        "- Proficient in Microsoft Office and QA software\n" +
+        "- Familiarity with Ghanaian health insurance and general insurance regulations is an advantage\n" +
+        "- Knowledge of claims, health service provider, and customer service operations is an added plus\n\n" +
+        "**Application Deadline:** 26th June, 2026.\n\n" +
+        "**To Apply:** https://careers.nationwideapps.com",
+      applyLink: "https://careers.nationwideapps.com",
+      verified: true
+    },
+    {
+      title: "Sales Executive",
+      company: "Not stated",
+      location: "Accra",
+      type: "Full-time",
+      salary: "Not stated, plus commissions & incentives",
+      posted: "25 Jun 2026",
+      description: "Build a sales career with training, mentorship, and attractive commissions. Age 25+ required.",
+      fullDescription:
+        "Build a rewarding career. Make impact. Grow. Succeed.\n\n" +
+        "Join a dynamic team where your ambition is valued, your growth is supported, and your success is rewarded every step of the way.\n\n" +
+        "**Requirements:**\n" +
+        "- SHS or Tertiary Certificate\n" +
+        "- Age 25 years and above\n" +
+        "- Good communication skills\n" +
+        "- Tech-savvy\n" +
+        "- Strong passion for sales\n\n" +
+        "**Why Join Us:**\n" +
+        "- Career growth opportunities\n" +
+        "- Professional training & mentorship\n" +
+        "- Attractive commissions & incentives\n" +
+        "- Supportive and professional work environment\n\n" +
+        "**To Apply:** Email dorisfosu010@gmail.com or WhatsApp CV to 054 033 7436.",
+      applyLink: "mailto:dorisfosu010@gmail.com",
+      verified: true
+    },
+    {
+      title: "Teachers Needed",
+      company: "Talent Scout GH",
+      location: "Kasoa and its environs",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "25 Jun 2026",
+      description: "Teaching roles available. Candidates close to Kasoa and its environs are preferred.",
+      fullDescription:
+        "Talent Scout GH is recruiting teachers. Candidates residing close to Kasoa and its environs are preferred for this role.\n\n" +
+        "**To Apply / Contact:**\n" +
+        "- Call: 024 396 6248\n" +
+        "- Email: info@talentscoutgh.com\n" +
+        "- Website: www.talentscoutgh.com",
+      applyLink: "mailto:info@talentscoutgh.com",
+      verified: true
+    },
+    {
+      title: "Preschool Teacher",
+      company: "Oak of Honour Nursery",
+      location: "Not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "25 Jun 2026",
+      description: "International preschool seeking experienced teachers with Cambridge, EYFS, or Montessori knowledge. French + English a strong plus.",
+      fullDescription:
+        "Are you passionate about working with young children and building strong connections with their parents? Do you thrive in a dynamic, international learning environment? If yes, we want you on our team!\n\n" +
+        "**What We Are Looking For:**\n" +
+        "- Experience: Minimum of 5 years working in an international preschool\n" +
+        "- Curriculum Knowledge: Strong understanding of Cambridge, EYFS, or Montessori frameworks\n" +
+        "- Language Skills: Ability to speak both French and English is a distinct advantage\n" +
+        "- Passion: A genuine love for early childhood education and excellent communication skills with parents\n\n" +
+        "**Our Mission:** Cultivate a lifelong love of learning, foster global citizens, support teacher growth & professional development.\n\n" +
+        "**Our Campus:** State-of-the-art learning spaces; safe, secure, and nurturing campus.\n\n" +
+        "**To Apply:** Send your CV to oakofhonournursery@yahoo.com.",
+      applyLink: "mailto:oakofhonournursery@yahoo.com",
+      verified: true
+    },
+    {
+      title: "Regional Research & Data Collection Officer",
+      company: "Cocoa360",
+      location: "Based in Ghana, with frequent travel across Africa",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "25 Jun 2026",
+      description: "Lead and coordinate field data collection across multiple African countries for Cocoa360's research and impact assessment initiatives.",
+      fullDescription:
+        "**About Cocoa360:** At Cocoa360, we are pioneering a self-sustaining model of rural development that leverages existing community resources to improve access to education and healthcare for Ghana's 1.6 million+ cocoa farmers - without long-term reliance on foreign aid. Our Farm-for-Impact model puts cocoa farmers in the driver's seat, partnering with rural communities to invest community-generated revenue in key educational and healthcare improvements.\n\n" +
+        "**Reports to:** Research Manager / Head of Research.\n\n" +
+        "**Position Summary:** Lead and coordinate field data collection across multiple African countries in support of Cocoa360's research, monitoring, evaluation and impact assessment initiatives. The role requires extensive travel and close collaboration with local research partners, enumerators, government agencies, healthcare facilities, schools and community stakeholders - ensuring all activities comply with approved protocols, ethical standards and applicable local regulations.\n\n" +
+        "**Key Responsibilities:**\n" +
+        "- Plan & coordinate data collection across assigned African countries\n" +
+        "- Travel to project sites to oversee field operations\n" +
+        "- Supervise local data collectors, research assistants & partner organizations\n" +
+        "- Coordinate IRB / ethics approvals with committees, ministries & regulators\n" +
+        "- Train & mentor field teams on methods, informed consent & confidentiality\n" +
+        "- Monitor data quality through verification, spot checks & validation\n" +
+        "- Prepare field reports, progress updates & documentation\n" +
+        "- Coordinate logistics and ensure secure handling & storage of research data\n" +
+        "- Build relationships with agencies, clinics, schools & community leaders\n\n" +
+        "**Qualifications:**\n" +
+        "- Degree in Public Health, Statistics, Development Studies, Social or Health Sciences, Economics or Research Methods\n" +
+        "- A master's degree is an added advantage\n" +
+        "- Experience coordinating field research or data collection across multiple locations\n" +
+        "- Familiarity with research ethics & obtaining approvals in international settings\n" +
+        "- Strong project coordination & stakeholder management skills\n" +
+        "- Proven ability to supervise field teams & ensure data quality\n" +
+        "- Excellent written & verbal English; additional African languages an advantage\n" +
+        "- Strong analytical, organizational & problem-solving skills\n\n" +
+        "**Deadline:** Mon, 29 June 2026.\n\n" +
+        "**To Apply:** Send your CV and cover letter to apply@cocoa360.org with the subject line \"Regional Research & Data Collection Officer\".",
+      applyLink: "mailto:apply@cocoa360.org",
+      verified: true
+    },
+    {
+      title: "Territory Manager",
+      company: "Petrosol",
+      location: "Anywhere in Ghana (must be willing to relocate)",
+      type: "Permanent, Full-time",
+      salary: "Attractive and competitive",
+      posted: "25 Jun 2026",
+      description: "Lead staff and own key performance indicators (sales volume, market share, compliance, profitability) for an assigned territory.",
+      fullDescription:
+        "The Territory Manager shall provide effective leadership for staff within the territory and have accountability for the achievement of key performance indicators for the entire territory such as sales volume (fuels, lubes and non-fuel revenue business), market share, receivables, regulatory compliance and profitability.\n\n" +
+        "**Job Type:** Permanent, Full-time.\n" +
+        "**Location:** Should be willing to move to any region in Ghana.\n" +
+        "**Total Compensation:** Attractive and Competitive.\n\n" +
+        "**Deadline:** 7th July, 2026.\n\n" +
+        "**To Apply:** Submit your updated CV and application letter to recruitment@petrosol.com.gh with the subject line \"TERRITORY MANAGER\". Only successful applicants will be contacted, 2 weeks after the deadline.",
+      applyLink: "mailto:recruitment@petrosol.com.gh",
+      verified: true
+    },
+    {
+      title: "Voluntary Internship - Software Engineering, Cybersecurity, UI/UX, Data Analytics, Digital Marketing & Finance",
+      company: "AmaliTech",
+      location: "Ghana (Accra, Takoradi, or Kumasi)",
+      type: "Onsite or Remote, Full-time (40 hrs/week), Unpaid",
+      salary: "Unpaid (structured internship)",
+      posted: "25 Jun 2026",
+      description: "Six-week voluntary internship for Ghanaian tertiary students/graduates. Cohort 3 (Aug-Sept) open to all; Cohort 4 (Oct-Nov) for women and PWDs only.",
+      fullDescription:
+        "Applications are open for the Third and Fourth Cohorts of the AmaliTech Voluntary Internship (AVI)!\n\n" +
+        "The AmaliTech Voluntary Internship (AVI) is a six-week programme designed for tertiary students and graduates ready to move beyond the classroom and into a real professional environment.\n\n" +
+        "**Cohorts:**\n" +
+        "- Third Cohort: August to September, open to all eligible applicants\n" +
+        "- Fourth Cohort: October to November, exclusively for females and persons with disabilities (PWDs)\n\n" +
+        "**Specialisations:** Software Engineering, Cybersecurity, UI/UX Design, Data Analytics, Digital Marketing, Finance.\n\n" +
+        "**Eligibility:**\n" +
+        "- Must be a Ghanaian tertiary student or graduate\n" +
+        "- Should be studying or have studied a programme relevant to the chosen specialisation\n" +
+        "- Must be at least 18 years old\n" +
+        "- Must not be currently working (engaged in any type of employment)\n\n" +
+        "Interns gain structured experience, guided mentorship, and professional networking opportunities, working onsite or remotely across AmaliTech's Ghana offices. Commitment: full-time, 40 hours per week.\n\n" +
+        "**To Apply:** https://amalitech.com/voluntary-internship/",
+      applyLink: "https://amalitech.com/voluntary-internship/",
+      verified: true
+    },
+    {
+      title: "Community & Channel Manager",
+      company: "Bingo Africa",
+      location: "Accra",
+      type: "2 openings, start TBC",
+      salary: "Not stated",
+      posted: "25 Jun 2026",
+      description: "Build and sustain an active Bingo Africa community across WhatsApp, Telegram, and social media with a 16-hour daily coverage window.",
+      fullDescription:
+        "Build and sustain an active, warm, trusted Bingo Africa community across WhatsApp, Telegram and social media; fast, human engagement across a 16-hour daily coverage window.\n\n" +
+        "**2 Openings.** Start: To be communicated.\n\n" +
+        "**What You'll Do:**\n" +
+        "- Moderate WhatsApp & Telegram channels on rotating 8-hour shifts, 7 days a week\n" +
+        "- Respond to players in English, Twi & Pidgin using the approved playbook\n" +
+        "- Post daily content: jackpot alerts, winner shoutouts, game tips & how-to-play guides\n" +
+        "- Run \"Learn to Play\" sessions and triage player issues for escalation\n" +
+        "- Join BTL activations across Accra to seed location-specific community groups\n\n" +
+        "**What We're Looking For:**\n" +
+        "- Social-media native with strong written communication\n" +
+        "- Fluent in English plus Twi or Pidgin\n" +
+        "- Calm under pressure, comfortable running multiple platforms on mobile\n" +
+        "- Prior community moderation experience for a brand is a strong plus\n\n" +
+        "**Deadline:** 26th June 2026.\n\n" +
+        "**To Apply:** Send your CV to socialba.ghana@lvt.games.",
+      applyLink: "mailto:socialba.ghana@lvt.games",
+      verified: true
+    },
+    {
+      title: "Content Creator & Videographer",
+      company: "Bingo Africa",
+      location: "Accra",
+      type: "1 opening, start TBC",
+      salary: "Not stated",
+      posted: "25 Jun 2026",
+      description: "Produce culturally resonant short-form video for the Bingo Africa brand across TikTok, Reels, Facebook & YouTube.",
+      fullDescription:
+        "Produce culturally resonant short-form video that builds the Bingo Africa brand, teaches players how to play, and celebrates the community across TikTok, Reels, Facebook & YouTube.\n\n" +
+        "**1 Opening.** Start: To be communicated.\n\n" +
+        "**What You'll Do:**\n" +
+        "- Concept, film & edit short-form video for a young Ghanaian audience (18-35)\n" +
+        "- Produce the \"Learn to Play\" video library in English, Twi & Pidgin\n" +
+        "- Capture winner celebrations, jackpot countdowns & launch event footage\n" +
+        "- Keep formats fresh, stay on-trend with TikTok & Reels in Ghana\n" +
+        "- Attend activations and the launch event for real-time content turnaround\n\n" +
+        "**What We're Looking For:**\n" +
+        "- Confident on camera and behind it\n" +
+        "- Can use a professional camera\n" +
+        "- Skilled in videography and mobile filmmaker/editor (CapCut or similar)\n" +
+        "- Sharp instinct for what performs on TikTok & Reels in Ghana\n" +
+        "- Fast-moving creative who can ship multiple pieces a week\n\n" +
+        "**Deadline:** 26th June 2026.\n\n" +
+        "**To Apply:** Send your CV to socialba.ghana@lvt.games.",
+      applyLink: "mailto:socialba.ghana@lvt.games",
+      verified: true
+    },
+    {
       title: "",
       company: "",
       location: "",
@@ -1087,7 +1396,7 @@
   var filledCount = realJobs.length;
 
   function renderJobCard(job, indexKey) {
-    var badge = job.verified ? '<span class="verified-badge">Checked by us</span>' : '';
+    var badge = job.verified ? '<span class="verified-badge">Verified by us</span>' : '';
     var waText = encodeURIComponent('Hi, I want help applying for: ' + job.title);
     var hasFull = job.fullDescription && job.fullDescription.trim().length > 0;
     var hint = hasFull ? '<div class="expand-hint">Tap title or Apply for full details ↓</div>' : '';
@@ -1200,6 +1509,21 @@
       backToTopBtn.classList.remove('is-visible');
     }
   });
+
+  // ---- Mobile hamburger menu ----
+  var menuToggle = document.getElementById('menuToggle');
+  var mobileMenu = document.getElementById('mobileMenu');
+  menuToggle.addEventListener('click', function() {
+    mobileMenu.classList.toggle('is-open');
+  });
+  // Close the menu once a link inside it is tapped, so it doesn't
+  // stay open hovering over the section you just jumped to.
+  var mobileMenuLinks = mobileMenu.querySelectorAll('a');
+  for (var ml = 0; ml < mobileMenuLinks.length; ml++) {
+    mobileMenuLinks[ml].addEventListener('click', function() {
+      mobileMenu.classList.remove('is-open');
+    });
+  }
 </script>
 
 </body>
