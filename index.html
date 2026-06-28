@@ -333,6 +333,39 @@
     border-radius:14px;
   }
 
+  /* ---------- FILTERS ---------- */
+  .filter-group{ margin-bottom: 14px; }
+  .filter-label{
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.66rem;
+    text-transform:uppercase;
+    letter-spacing:0.06em;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
+  }
+  .filter-bar{
+    display:flex;
+    flex-wrap:wrap;
+    gap: 6px;
+  }
+  .filter-chip{
+    background: var(--white);
+    border: 1.2px solid var(--paper-line);
+    color: var(--ink-soft);
+    font-family:'Inter', sans-serif;
+    font-size:0.78rem;
+    padding: 6px 12px;
+    border-radius: 20px;
+    cursor:pointer;
+    transition: border-color 0.15s ease, color 0.15s ease, background 0.15s ease;
+  }
+  .filter-chip:hover{ border-color: var(--clay-soft); color: var(--clay); }
+  .filter-chip.is-active{
+    background: var(--green);
+    border-color: var(--green);
+    color: var(--white);
+  }
+
   /* ---------- PAGINATION ---------- */
   .pagination{
     display:flex;
@@ -429,6 +462,14 @@
 
     <section id="jobs">
       <div class="divider"><span class="eyebrow">Open Listings</span><span class="line"></span></div>
+      <div class="filter-group">
+        <div class="filter-label">Category</div>
+        <div class="filter-bar" id="categoryFilter"><!-- category chips injected by script --></div>
+      </div>
+      <div class="filter-group">
+        <div class="filter-label">Region</div>
+        <div class="filter-bar" id="regionFilter"><!-- region chips injected by script --></div>
+      </div>
       <div id="jobList"><!-- job cards injected here by script --></div>
       <div class="pagination" id="pagination"><!-- page controls injected by script --></div>
     </section>
@@ -480,6 +521,17 @@
                      posting itself doesn't name one — never invent
                      a real company name that wasn't in the source)
        location    - e.g. "Accra" or "Remote"
+       category    - which filter chip this job appears under, e.g.
+                     "IT & Software", "Sales & Business Development",
+                     "Education", "Driving & Transport". Use an existing
+                     category from another job whenever the role fits —
+                     reusing categories keeps the filter bar from growing
+                     a new chip for every single listing. Only invent a
+                     new category name if nothing existing fits at all.
+       region      - which region filter chip this job appears under,
+                     e.g. "Greater Accra", "Ashanti", "Western", "Volta",
+                     "Northern / Upper West", "Anywhere / Remote". Use
+                     "Region not stated" if the posting didn't say where.
        type        - e.g. "Full-time", "Part-time", "Contract"
        salary      - e.g. "GHC 1,500 - 2,000" or "Not stated" if unknown
        posted      - date you added it, e.g. "24 Jun 2026"
@@ -502,36 +554,28 @@
                      job-actions-full below).
        verified    - true / false — only mark true once YOU have
                      personally checked the source is real
+
+     A NOTE ON POSTINGS WITH SEVERAL DIFFERENT ROLES:
+     If one flyer/post lists several genuinely different jobs (e.g. a
+     school hiring 5 different kinds of teachers, or a company hiring
+     both a Frontend Developer and a Project Manager), give EACH role
+     its OWN { ... } block with its own category — copy the company/
+     location/posted/applyLink across all of them. This is what makes
+     filtering by category actually accurate. Don't bundle unrelated
+     roles into one card just to save typing.
      ============================================================ */
   var jobs = [
     {
       title: "District Business Development Lead",
       company: "Talent Scout GH",
       location: "Afram Plains",
+      category: "Sales & Business Development",
+      region: "Eastern",
       type: "Full-time",
       salary: "GHS 2,000 - 3,000 + commission",
       posted: "24 Jun 2026",
       description: "Lead district-level revenue growth, client acquisition, and partnerships for a growing organization.",
-      fullDescription:
-        "Lead the District. Grow the Business. Build Your Future.\n\n" +
-        "Join a growing organization and play a key role in expanding market presence, acquiring clients and driving revenue growth across the Afram Plains District.\n\n" +
-        "**Key Responsibilities:**\n" +
-        "- Generate revenue and achieve sales targets\n" +
-        "- Acquire new clients and expand market share\n" +
-        "- Build strategic partnerships and stakeholder relationships\n" +
-        "- Identify and develop new business opportunities\n" +
-        "- Manage key accounts and drive customer retention\n" +
-        "- Represent the organization across the district\n" +
-        "- Lead market expansion initiatives\n\n" +
-        "**Requirements:**\n" +
-        "- Bachelor's Degree in Business, Marketing, Sales or a related field\n" +
-        "- Minimum 3 years' experience in Business Development, Sales or a related role\n" +
-        "- Proven record of exceeding sales targets\n" +
-        "- Strong negotiation and relationship management skills\n" +
-        "- Must reside in Afram Plains District or be willing to relocate\n" +
-        "- Valid driver's licence is an advantage\n\n" +
-        "**Ideal Candidates:** Business Development Managers, Regional Sales Managers, Territory Managers, Area Sales Managers, Relationship Managers, Key Account Managers, Corporate Sales Executives, Commercial Officers, Sales Executives.\n\n" +
-        "**To Apply:** Send your CV and required information to info@talentscoutgh.com or WhatsApp 0205106406.",
+      fullDescription: "Lead the District. Grow the Business. Build Your Future.\n\nJoin a growing organization and play a key role in expanding market presence, acquiring clients and driving revenue growth across the Afram Plains District.\n\n**Key Responsibilities:**\n- Generate revenue and achieve sales targets\n- Acquire new clients and expand market share\n- Build strategic partnerships and stakeholder relationships\n- Identify and develop new business opportunities\n- Manage key accounts and drive customer retention\n- Represent the organization across the district\n- Lead market expansion initiatives\n\n**Requirements:**\n- Bachelor's Degree in Business, Marketing, Sales or a related field\n- Minimum 3 years' experience in Business Development, Sales or a related role\n- Proven record of exceeding sales targets\n- Strong negotiation and relationship management skills\n- Must reside in Afram Plains District or be willing to relocate\n- Valid driver's licence is an advantage\n\n**Ideal Candidates:** Business Development Managers, Regional Sales Managers, Territory Managers, Area Sales Managers, Relationship Managers, Key Account Managers, Corporate Sales Executives, Commercial Officers, Sales Executives.\n\n**To Apply:** Send your CV and required information to info@talentscoutgh.com or WhatsApp 0205106406.",
       applyLink: "mailto:info@talentscoutgh.com",
       verified: true
     },
@@ -539,32 +583,13 @@
       title: "Personal Assistant & Assistant Accountant",
       company: "Elite Choice Company Limited",
       location: "Accra",
+      category: "Admin & Office Support",
+      region: "Greater Accra",
       type: "Office Work",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Support daily admin operations and financial record-keeping in a single combined PA/accounting role.",
-      fullDescription:
-        "Join our team and be part of innovating the future of mobility.\n\n" +
-        "Application deadline: Open until filled.\n\n" +
-        "**Requirements:**\n" +
-        "- A Bachelor's Degree or HND in Administration\n" +
-        "- 1-2 years of proven experience as a P.A\n" +
-        "- Highly organised, detail-driven, multitasker\n" +
-        "- Proficiency in MS Office + Google Workspace\n" +
-        "- Excellent communication + confidentiality\n" +
-        "- Proactive & thrives under pressure\n\n" +
-        "**Responsibilities:**\n" +
-        "- Manage schedules and appointments\n" +
-        "- Handle emails, calls, and correspondence\n" +
-        "- Organize meetings and office records\n" +
-        "- Prepare reports and documents\n" +
-        "- Support daily administrative operations\n" +
-        "- Record financial transactions\n" +
-        "- Prepare invoices and receipts\n" +
-        "- Maintain financial records\n" +
-        "- Reconcile accounts and bank statements\n" +
-        "- Assist with payroll and financial reporting\n\n" +
-        "**To Apply:** Send your CV and other documents to elitechoicelogistics1@gmail.com. For more information, WhatsApp 0593319087.",
+      fullDescription: "Join our team and be part of innovating the future of mobility.\n\nApplication deadline: Open until filled.\n\n**Requirements:**\n- A Bachelor's Degree or HND in Administration\n- 1-2 years of proven experience as a P.A\n- Highly organised, detail-driven, multitasker\n- Proficiency in MS Office + Google Workspace\n- Excellent communication + confidentiality\n- Proactive & thrives under pressure\n\n**Responsibilities:**\n- Manage schedules and appointments\n- Handle emails, calls, and correspondence\n- Organize meetings and office records\n- Prepare reports and documents\n- Support daily administrative operations\n- Record financial transactions\n- Prepare invoices and receipts\n- Maintain financial records\n- Reconcile accounts and bank statements\n- Assist with payroll and financial reporting\n\n**To Apply:** Send your CV and other documents to elitechoicelogistics1@gmail.com. For more information, WhatsApp 0593319087.",
       applyLink: "mailto:elitechoicelogistics1@gmail.com",
       verified: true
     },
@@ -572,30 +597,13 @@
       title: "Househelp (Live-in)",
       company: "Private Household",
       location: "Spintex - Baatsona, Accra",
+      category: "Domestic & Hospitality",
+      region: "Greater Accra",
       type: "Live-in, Full-time",
       salary: "GHS 700 - 900 + meals & accommodation",
       posted: "24 Jun 2026",
       description: "A young couple is looking for a live-in househelp to support cleaning, laundry, meals, and occasional childcare.",
-      fullDescription:
-        "A young couple is looking for a Househelp.\n\n" +
-        "- Young lady\n" +
-        "- Christian\n" +
-        "- Age range: 19-27\n" +
-        "- Speaks and understands some level of English and Twi\n\n" +
-        "**Job Description:**\n" +
-        "- Sweeping (both indoors and outdoors)\n" +
-        "- Mopping\n" +
-        "- Dusting\n" +
-        "- Cleaning washrooms, bathrooms and bedrooms\n" +
-        "- Washing (utensils, clothes — both hand wash and washing machine)\n" +
-        "- Ironing\n" +
-        "- Engage and play with kids when necessary\n" +
-        "- Required to attend church every Sunday with the family\n" +
-        "- Heating kids' meals and feeding them when necessary\n" +
-        "- Assisting with preparation of meals\n\n" +
-        "**Salary:** GHS 700 - 900. Meals provided by home. Live-in help.\n" +
-        "**Location:** Spintex, Baatsona.\n\n" +
-        "**To Apply:** For more information, contact Pearl on 0504990295",
+      fullDescription: "A young couple is looking for a Househelp.\n\n- Young lady\n- Christian\n- Age range: 19-27\n- Speaks and understands some level of English and Twi\n\n**Job Description:**\n- Sweeping (both indoors and outdoors)\n- Mopping\n- Dusting\n- Cleaning washrooms, bathrooms and bedrooms\n- Washing (utensils, clothes — both hand wash and washing machine)\n- Ironing\n- Engage and play with kids when necessary\n- Required to attend church every Sunday with the family\n- Heating kids' meals and feeding them when necessary\n- Assisting with preparation of meals\n\n**Salary:** GHS 700 - 900. Meals provided by home. Live-in help.\n**Location:** Spintex, Baatsona.\n\n**To Apply:** For more information, contact Pearl on 0504990295",
       applyLink: "#",
       verified: false
     },
@@ -603,15 +611,13 @@
       title: "Credit Analyst",
       company: "Talent Scout GH",
       location: "Mallam and its environs",
+      category: "Finance & Accounting",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "Competitive (not stated)",
       posted: "24 Jun 2026",
       description: "Analyze credit risk and assess loan applications for a financial services client in the Mallam area.",
-      fullDescription:
-        "**Key Role:** Analyze credit risk and assess loan applications.\n\n" +
-        "**Requirements:** Relevant degree or professional qualification.\n\n" +
-        "**What We Offer:** Very competitive salary and great career growth.\n\n" +
-        "**To Apply:** Click the link below to apply directly, or call/WhatsApp 0243 966 248. Send your CV to info@talentscoutgh.com.",
+      fullDescription: "**Key Role:** Analyze credit risk and assess loan applications.\n\n**Requirements:** Relevant degree or professional qualification.\n\n**What We Offer:** Very competitive salary and great career growth.\n\n**To Apply:** Click the link below to apply directly, or call/WhatsApp 0243 966 248. Send your CV to info@talentscoutgh.com.",
       applyLink: "https://talentscoutgh.com/job/talent-scout-full-time-credit-analyst/",
       verified: true
     },
@@ -619,18 +625,13 @@
       title: "Operations Manager",
       company: "Reputable Company",
       location: "Kumasi",
+      category: "Sales & Business Development",
+      region: "Ashanti",
       type: "Full-time",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Lead operations for a marketing firm in Kumasi — requires a relevant degree and 3-5 years of marketing-firm experience.",
-      fullDescription:
-        "Operations Manager urgently needed in Kumasi.\n\n" +
-        "**Requirements:**\n" +
-        "- Degree in Accounting, Marketing, Management, Supply Chain, or Logistics\n" +
-        "- A background in Law is a plus\n" +
-        "- 3-5 years' experience in a marketing firm\n" +
-        "- Must know how to drive\n\n" +
-        "**To Apply:** Send your CV / contact 0544047442.",
+      fullDescription: "Operations Manager urgently needed in Kumasi.\n\n**Requirements:**\n- Degree in Accounting, Marketing, Management, Supply Chain, or Logistics\n- A background in Law is a plus\n- 3-5 years' experience in a marketing firm\n- Must know how to drive\n\n**To Apply:** Send your CV / contact 0544047442.",
       applyLink: "tel:0544047442",
       verified: true
     },
@@ -638,27 +639,13 @@
       title: "Senior Human Resource & Administration Officer",
       company: "The Green Belt Movement (GBM)",
       location: "Accra",
+      category: "HR & Admin",
+      region: "Greater Accra",
       type: "Full-time, On-site",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Lead HR and administration functions, operational efficiency, and policy compliance for an environmental NGO.",
-      fullDescription:
-        "**Employer:** The Green Belt Movement (GBM).\n" +
-        "**Location:** Accra, Ghana.\n" +
-        "**Job Type:** Full-time, On-site.\n" +
-        "**Application Deadline:** June 26, 2026.\n\n" +
-        "**Role requires leadership in:**\n" +
-        "- HR and administration functions\n" +
-        "- Operational efficiency\n" +
-        "- Compliance with labour laws\n" +
-        "- Alignment with organizational strategy and values\n\n" +
-        "**Responsibilities:**\n" +
-        "- Lead and manage the organization's human resources and administrative functions\n" +
-        "- Ensure operational efficiency\n" +
-        "- Ensure compliance with applicable labour laws\n" +
-        "- Ensure alignment with organizational strategy and values\n\n" +
-        "**To Apply:** Submit a single document containing your cover letter and CV (do not attach certificates) with the subject line \"Senior HR and Administration Officer Application\" to jobs@greenbeltmovement.org. Only shortlisted candidates will be contacted.\n\n" +
-        "Note: the original posting referenced Kenyan labour law while listing Accra, Ghana as the location — likely a multi-country template not fully updated for this role. Worth confirming directly with GBM before applying.",
+      fullDescription: "**Employer:** The Green Belt Movement (GBM).\n**Location:** Accra, Ghana.\n**Job Type:** Full-time, On-site.\n**Application Deadline:** June 26, 2026.\n\n**Role requires leadership in:**\n- HR and administration functions\n- Operational efficiency\n- Compliance with labour laws\n- Alignment with organizational strategy and values\n\n**Responsibilities:**\n- Lead and manage the organization's human resources and administrative functions\n- Ensure operational efficiency\n- Ensure compliance with applicable labour laws\n- Ensure alignment with organizational strategy and values\n\n**To Apply:** Submit a single document containing your cover letter and CV (do not attach certificates) with the subject line \"Senior HR and Administration Officer Application\" to jobs@greenbeltmovement.org. Only shortlisted candidates will be contacted.\n\nNote: the original posting referenced Kenyan labour law while listing Accra, Ghana as the location — likely a multi-country template not fully updated for this role. Worth confirming directly with GBM before applying.",
       applyLink: "mailto:jobs@greenbeltmovement.org",
       verified: true
     },
@@ -666,16 +653,13 @@
       title: "Chinese Translator & Personal Assistant",
       company: "Not stated",
       location: "Accra",
+      category: "Admin & Office Support",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "GHS 5,000 - 8,000",
       posted: "24 Jun 2026",
       description: "Chinese translator who can also drive and handle basic personal assistant duties.",
-      fullDescription:
-        "Chinese Translator Needed.\n\n" +
-        "Looking for a Chinese Translator who can also drive and assist with basic Personal Assistant duties.\n\n" +
-        "**Salary:** GH₵5,000 – GH₵8,000.\n\n" +
-        "**To Apply:** Call/WhatsApp 020 177 7022.\n\n" +
-        "Note: no company name was given in the original posting, and contact is WhatsApp-only — worth verifying who you're actually speaking to before sharing any documents or personal details.",
+      fullDescription: "Chinese Translator Needed.\n\nLooking for a Chinese Translator who can also drive and assist with basic Personal Assistant duties.\n\n**Salary:** GH₵5,000 – GH₵8,000.\n\n**To Apply:** Call/WhatsApp 020 177 7022.\n\nNote: no company name was given in the original posting, and contact is WhatsApp-only — worth verifying who you're actually speaking to before sharing any documents or personal details.",
       applyLink: "#",
       verified: false
     },
@@ -683,30 +667,13 @@
       title: "Human Resource Officer",
       company: "CERATH Development Organization (CERATH)",
       location: "Accra",
+      category: "HR & Admin",
+      region: "Greater Accra",
       type: "Full-time, On-site",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Support recruitment, onboarding, and HR documentation for a development organization. Open until filled.",
-      fullDescription:
-        "**Employer:** CERATH Development Organization (CERATH).\n" +
-        "**Location:** Accra, Ghana.\n" +
-        "**Job Type:** Full-Time, On-site.\n" +
-        "**Application Deadline:** Open until filled.\n\n" +
-        "**Requirements:**\n" +
-        "- Bachelor's Degree in Human Resource Management or a related field\n" +
-        "- At least 1-2 years' relevant HR experience (advantage)\n" +
-        "- Good communication and interpersonal skills\n" +
-        "- Strong organizational and administrative abilities\n" +
-        "- Proficiency in Microsoft Office applications\n" +
-        "- Ability to maintain confidentiality and work with minimal supervision\n\n" +
-        "**Responsibilities:**\n" +
-        "- Support recruitment and selection processes\n" +
-        "- Maintain employee records and HR documentation\n" +
-        "- Coordinate staff onboarding, training, and performance management activities\n" +
-        "- Assist in implementing HR policies and procedures\n" +
-        "- Prepare HR reports and ensure compliance with labor regulations\n" +
-        "- Handle employee relations matters and provide administrative support to staff\n\n" +
-        "**To Apply:** Send your CV and cover letter with the subject line \"Application for Human Resource Officer Position\" to info@cerathdev.org.",
+      fullDescription: "**Employer:** CERATH Development Organization (CERATH).\n**Location:** Accra, Ghana.\n**Job Type:** Full-Time, On-site.\n**Application Deadline:** Open until filled.\n\n**Requirements:**\n- Bachelor's Degree in Human Resource Management or a related field\n- At least 1-2 years' relevant HR experience (advantage)\n- Good communication and interpersonal skills\n- Strong organizational and administrative abilities\n- Proficiency in Microsoft Office applications\n- Ability to maintain confidentiality and work with minimal supervision\n\n**Responsibilities:**\n- Support recruitment and selection processes\n- Maintain employee records and HR documentation\n- Coordinate staff onboarding, training, and performance management activities\n- Assist in implementing HR policies and procedures\n- Prepare HR reports and ensure compliance with labor regulations\n- Handle employee relations matters and provide administrative support to staff\n\n**To Apply:** Send your CV and cover letter with the subject line \"Application for Human Resource Officer Position\" to info@cerathdev.org.",
       applyLink: "mailto:info@cerathdev.org",
       verified: false
     },
@@ -714,16 +681,13 @@
       title: "Senior Programs & Performance Officer",
       company: "Her Initiative",
       location: "Not stated",
+      category: "Admin & Office Support",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Join Her Initiative's team as Senior Programs & Performance Officer. Apply via the link before the deadline.",
-      fullDescription:
-        "**We Are Hiring!** Join our team.\n\n" +
-        "**Role:** Senior Programs & Performance Officer.\n\n" +
-        "**Deadline:** 3rd July, 2026.\n\n" +
-        "**To Apply:** Apply through https://kaziconnect.co.tz/\n\n" +
-        "Note: the application link is a .co.tz (Tanzania) domain for an organization called Her Initiative — worth double-checking the role's actual base location and legitimacy before applying.",
+      fullDescription: "**We Are Hiring!** Join our team.\n\n**Role:** Senior Programs & Performance Officer.\n\n**Deadline:** 3rd July, 2026.\n\n**To Apply:** Apply through https://kaziconnect.co.tz/\n\nNote: the application link is a .co.tz (Tanzania) domain for an organization called Her Initiative — worth double-checking the role's actual base location and legitimacy before applying.",
       applyLink: "https://kaziconnect.co.tz/",
       verified: false
     },
@@ -731,30 +695,13 @@
       title: "Maintenance Officer",
       company: "Broll Ghana",
       location: "Airport City, Accra",
+      category: "Trades & Technical",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Handle preventive maintenance, equipment installation, and routine building upkeep for a property management firm.",
-      fullDescription:
-        "**Division:** Property Management.\n" +
-        "**Reporting To:** Operations Manager.\n" +
-        "**Job Location:** Airport City, Accra.\n\n" +
-        "**Position Purpose:** Responsible for the maintenance of the building. Completes preventive maintenance, installs new equipment, and assists with routine building maintenance. Completes work order records and files all related maintenance paperwork. Assists area staff as required, responds to maintenance needs, and keeps management well informed.\n\n" +
-        "**Summary Responsibilities:**\n" +
-        "- Continuously checks and inspects buildings to identify maintenance needs\n" +
-        "- Responds promptly and efficiently to tenant maintenance requirements\n" +
-        "- Responds promptly and efficiently to duties allocated by the Centre Manager or Operations Manager\n" +
-        "- Checks all main outer and inner doors (broken glass, open and close properly etc.)\n" +
-        "- Checks exterior of buildings and identifies problem areas\n" +
-        "- Checks all fittings in toilets (taps, basins, urinals etc.)\n" +
-        "- Checks all equipment such as air-conditioning plant, standby pumps, sump pump, water tanks, water feature equipment etc.\n" +
-        "- Ensures familiarity with emergency equipment and procedures\n" +
-        "- Performs repairs where necessary and escalates to operations manager when required\n" +
-        "- Identifies daily maintenance issues, communicates with the operations manager, and schedules work accordingly\n" +
-        "- Inspects equipment, checks operating condition, and logs repair needs\n" +
-        "- Follows all safety rules and procedures; ensures compliance with legal regulations and OSHA requirements\n" +
-        "- Assumes responsibility for tenant installations: quality control checks, ensuring premises are satisfactory before move-in, assisting tenants on move-in, and assisting with removal/relocation of partitioning where necessary\n\n" +
-        "**To Apply:** Contact details were not shown on this flyer — check with Broll Ghana directly for the application channel.",
+      fullDescription: "**Division:** Property Management.\n**Reporting To:** Operations Manager.\n**Job Location:** Airport City, Accra.\n\n**Position Purpose:** Responsible for the maintenance of the building. Completes preventive maintenance, installs new equipment, and assists with routine building maintenance. Completes work order records and files all related maintenance paperwork. Assists area staff as required, responds to maintenance needs, and keeps management well informed.\n\n**Summary Responsibilities:**\n- Continuously checks and inspects buildings to identify maintenance needs\n- Responds promptly and efficiently to tenant maintenance requirements\n- Responds promptly and efficiently to duties allocated by the Centre Manager or Operations Manager\n- Checks all main outer and inner doors (broken glass, open and close properly etc.)\n- Checks exterior of buildings and identifies problem areas\n- Checks all fittings in toilets (taps, basins, urinals etc.)\n- Checks all equipment such as air-conditioning plant, standby pumps, sump pump, water tanks, water feature equipment etc.\n- Ensures familiarity with emergency equipment and procedures\n- Performs repairs where necessary and escalates to operations manager when required\n- Identifies daily maintenance issues, communicates with the operations manager, and schedules work accordingly\n- Inspects equipment, checks operating condition, and logs repair needs\n- Follows all safety rules and procedures; ensures compliance with legal regulations and OSHA requirements\n- Assumes responsibility for tenant installations: quality control checks, ensuring premises are satisfactory before move-in, assisting tenants on move-in, and assisting with removal/relocation of partitioning where necessary\n\n**To Apply:** Contact details were not shown on this flyer — check with Broll Ghana directly for the application channel.",
       applyLink: "#",
       verified: false
     },
@@ -762,23 +709,13 @@
       title: "Cashier / Wait Staff",
       company: "CleanEats (Healthy Fast Food)",
       location: "East Legon, Tema and its environs",
+      category: "Hospitality & Food Service",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Customer-facing cashier and wait staff role for a healthy fast food brand. Applicant must live in East Legon or Tema area.",
-      fullDescription:
-        "**Requirements:**\n" +
-        "- SHS, Diploma, or HND in Accounting\n" +
-        "- Previous experience in a customer service or cashier role, preferably in the food service industry\n" +
-        "- Strong interpersonal and communication skills\n" +
-        "- Ability to handle transactions accurately and efficiently\n" +
-        "- Knowledge of basic math and cash handling procedures\n\n" +
-        "**Duties:**\n" +
-        "- Customer Service: greet customers warmly and provide prompt, courteous service\n" +
-        "- Assist customers in selecting menu items and offer recommendations based on preferences and dietary needs\n" +
-        "- Address customer inquiries and resolve issues or complaints efficiently and professionally\n\n" +
-        "Applicant must live in East Legon, Tema and its environs.\n\n" +
-        "**To Apply:** Send your cover letter and CV to hr@cleaneatsgh.com. More info: Cleaneatsgh.com/careers",
+      fullDescription: "**Requirements:**\n- SHS, Diploma, or HND in Accounting\n- Previous experience in a customer service or cashier role, preferably in the food service industry\n- Strong interpersonal and communication skills\n- Ability to handle transactions accurately and efficiently\n- Knowledge of basic math and cash handling procedures\n\n**Duties:**\n- Customer Service: greet customers warmly and provide prompt, courteous service\n- Assist customers in selecting menu items and offer recommendations based on preferences and dietary needs\n- Address customer inquiries and resolve issues or complaints efficiently and professionally\n\nApplicant must live in East Legon, Tema and its environs.\n\n**To Apply:** Send your cover letter and CV to hr@cleaneatsgh.com. More info: Cleaneatsgh.com/careers",
       applyLink: "mailto:hr@cleaneatsgh.com",
       verified: true
     },
@@ -786,23 +723,13 @@
       title: "Human Resources Administrator",
       company: "CleanEats (Healthy Fast Food)",
       location: "Tema and its environs",
+      category: "HR & Admin",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Manage recruitment, onboarding, and employee records for a healthy fast food brand. Applicant must live in Tema area.",
-      fullDescription:
-        "**Duties:**\n" +
-        "- Manage the recruitment process\n" +
-        "- Manage the onboarding process for new hires\n" +
-        "- Maintain accurate and confidential employee records\n" +
-        "- Assist in resolving employee issues and conflicts, promoting a positive workplace culture through effective communication and mediation\n\n" +
-        "**Qualification:**\n" +
-        "- Bachelor's degree in Human Resources, Business Administration, or a related field\n" +
-        "- Minimum of 3 years' experience in human resources, preferably in the food service or retail industry\n" +
-        "- Strong knowledge of employment laws and regulations\n" +
-        "- Excellent organizational and multitasking skills, with strong attention to detail\n\n" +
-        "Applicant must live in Tema and its environs.\n\n" +
-        "**To Apply:** hr@cleaneatsgh.com. Website: www.cleaneatsgh.com/careers",
+      fullDescription: "**Duties:**\n- Manage the recruitment process\n- Manage the onboarding process for new hires\n- Maintain accurate and confidential employee records\n- Assist in resolving employee issues and conflicts, promoting a positive workplace culture through effective communication and mediation\n\n**Qualification:**\n- Bachelor's degree in Human Resources, Business Administration, or a related field\n- Minimum of 3 years' experience in human resources, preferably in the food service or retail industry\n- Strong knowledge of employment laws and regulations\n- Excellent organizational and multitasking skills, with strong attention to detail\n\nApplicant must live in Tema and its environs.\n\n**To Apply:** hr@cleaneatsgh.com. Website: www.cleaneatsgh.com/careers",
       applyLink: "mailto:hr@cleaneatsgh.com",
       verified: true
     },
@@ -810,35 +737,13 @@
       title: "Logistics Manager",
       company: "Global Talent Masters (GTM), for a manufacturing client",
       location: "Tema",
+      category: "Logistics & Supply Chain",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "GHC 14,500 - 20,000 + benefits",
       posted: "24 Jun 2026",
       description: "Plan, coordinate, and oversee distribution of finished goods for a manufacturing company in Tema. 8-10 years' FMCG logistics experience required.",
-      fullDescription:
-        "**Sector:** Manufacturing.\n\n" +
-        "**Job Overview:** Looking for a Logistics Manager to be responsible for planning, coordinating and overseeing the movement and distribution of finished goods in a timely and cost-efficient manner while maintaining quality and safety standards.\n\n" +
-        "**Responsibilities:**\n" +
-        "- Oversee outbound distribution of finished goods to distributors and customers\n" +
-        "- Coordinate transportation, liaise with transporters and negotiate rates\n" +
-        "- Monitor logistics costs and implement cost-saving initiatives\n" +
-        "- Ensure compliance with food safety, quality and regulatory requirements\n" +
-        "- Provide leadership and support to logistics staff\n" +
-        "- Liaise with internal teams (production, sales & finance) to optimize operations\n" +
-        "- Prepare logistics reports and performance metrics\n" +
-        "- Ensure site security; implement and monitor security protocols\n" +
-        "- Recruit, train, and supervise machine operators, technicians, and support staff\n" +
-        "- Implement performance reviews and training\n" +
-        "- Manage relationships with suppliers and cooperatives\n" +
-        "- Enforce compliance with environmental, health, and safety standards\n\n" +
-        "**Qualifications & Skills:**\n" +
-        "- Degree/Master's in Logistics, Supply Chain Management, or Business Administration\n" +
-        "- At least 8-10 years' experience managing logistics in an FMCG environment\n" +
-        "- Strong expertise in documentation and inland transport coordination\n" +
-        "- Experience managing transporters\n" +
-        "- Proficiency in MS Excel/ERP Systems\n\n" +
-        "**Salary Package:** Net salary of GHC 14,500 - 20,000, plus competitive benefits commensurate with experience.\n\n" +
-        "**Apply Before:** 30th June, 2026.\n\n" +
-        "**To Apply:** Email CV to ransford@globaltalentmasters.com or info@globaltalentmasters.com, or WhatsApp 0244 218 566.",
+      fullDescription: "**Sector:** Manufacturing.\n\n**Job Overview:** Looking for a Logistics Manager to be responsible for planning, coordinating and overseeing the movement and distribution of finished goods in a timely and cost-efficient manner while maintaining quality and safety standards.\n\n**Responsibilities:**\n- Oversee outbound distribution of finished goods to distributors and customers\n- Coordinate transportation, liaise with transporters and negotiate rates\n- Monitor logistics costs and implement cost-saving initiatives\n- Ensure compliance with food safety, quality and regulatory requirements\n- Provide leadership and support to logistics staff\n- Liaise with internal teams (production, sales & finance) to optimize operations\n- Prepare logistics reports and performance metrics\n- Ensure site security; implement and monitor security protocols\n- Recruit, train, and supervise machine operators, technicians, and support staff\n- Implement performance reviews and training\n- Manage relationships with suppliers and cooperatives\n- Enforce compliance with environmental, health, and safety standards\n\n**Qualifications & Skills:**\n- Degree/Master's in Logistics, Supply Chain Management, or Business Administration\n- At least 8-10 years' experience managing logistics in an FMCG environment\n- Strong expertise in documentation and inland transport coordination\n- Experience managing transporters\n- Proficiency in MS Excel/ERP Systems\n\n**Salary Package:** Net salary of GHC 14,500 - 20,000, plus competitive benefits commensurate with experience.\n\n**Apply Before:** 30th June, 2026.\n\n**To Apply:** Email CV to ransford@globaltalentmasters.com or info@globaltalentmasters.com, or WhatsApp 0244 218 566.",
       applyLink: "mailto:ransford@globaltalentmasters.com",
       verified: true
     },
@@ -846,18 +751,13 @@
       title: "Digital Marketer & Content Strategist",
       company: "Twinbrook Properties",
       location: "Osu, Accra",
+      category: "Marketing & Communications",
+      region: "Greater Accra",
       type: "Full-time, On-site",
       salary: "Competitive (not stated)",
       posted: "23 Jun 2026",
       description: "Own the online presence for a real estate company in Osu — social, content, SEO, and analytics.",
-      fullDescription:
-        "Twinbrook Properties (Osu, Accra) is looking for a bold, creative Digital Marketer & Content Strategist to own our online presence.\n\n" +
-        "**Location:** Osu, Accra. On-site, Full-time.\n\n" +
-        "**You should be great at:**\n" +
-        "- Social media & paid ads\n" +
-        "- Content creation & strategy\n" +
-        "- SEO, email & analytics\n\n" +
-        "**To Apply:** Send your CV + portfolio to tclrecruitment2025@gmail.com. Only shortlisted candidates will be contacted.",
+      fullDescription: "Twinbrook Properties (Osu, Accra) is looking for a bold, creative Digital Marketer & Content Strategist to own our online presence.\n\n**Location:** Osu, Accra. On-site, Full-time.\n\n**You should be great at:**\n- Social media & paid ads\n- Content creation & strategy\n- SEO, email & analytics\n\n**To Apply:** Send your CV + portfolio to tclrecruitment2025@gmail.com. Only shortlisted candidates will be contacted.",
       applyLink: "mailto:tclrecruitment2025@gmail.com",
       verified: true
     },
@@ -865,34 +765,13 @@
       title: "Legal Secretary",
       company: "RBN Solicitors",
       location: "Ghana Office",
+      category: "Admin & Office Support",
+      region: "Region not stated",
       type: "Full-time",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Support a law firm's day-to-day legal admin — filing, scheduling, correspondence, and client inquiries.",
-      fullDescription:
-        "**Key Responsibilities:**\n" +
-        "- Prepare, proofread, and file legal documents and correspondence\n" +
-        "- Manage lawyers' schedules, appointments, and court dates\n" +
-        "- Maintain and organize legal files and records\n" +
-        "- Handle client inquiries and correspondence professionally\n" +
-        "- Coordinate meetings and prepare minutes when required\n\n" +
-        "**Education & Experience:**\n" +
-        "- Diploma or Degree in Secretarial Studies, Business Administration, Law, or a related field\n" +
-        "- Minimum of 2-3 years' experience as a Legal Secretary, Administrative Assistant, or similar role\n" +
-        "- Experience working in a law firm is an advantage\n\n" +
-        "**Skills & Competencies:**\n" +
-        "- Excellent written and verbal communication skills\n" +
-        "- Proficiency in Microsoft Office Suite (Word, Excel, PowerPoint, Outlook)\n" +
-        "- Strong typing, transcription, and document formatting skills\n" +
-        "- Excellent organizational and time-management abilities\n" +
-        "- Strong attention to detail and accuracy\n" +
-        "- Ability to work under pressure and meet deadlines\n\n" +
-        "**Additional Requirements:**\n" +
-        "- Professional appearance and conduct\n" +
-        "- Strong interpersonal and customer service skills\n" +
-        "- Ability to work independently and as part of a team\n" +
-        "- Knowledge of court filing procedures is an added advantage\n\n" +
-        "**To Apply:** Send CV to office@rbnsolicitors.co.uk or call/WhatsApp +233 53 259 0556.",
+      fullDescription: "**Key Responsibilities:**\n- Prepare, proofread, and file legal documents and correspondence\n- Manage lawyers' schedules, appointments, and court dates\n- Maintain and organize legal files and records\n- Handle client inquiries and correspondence professionally\n- Coordinate meetings and prepare minutes when required\n\n**Education & Experience:**\n- Diploma or Degree in Secretarial Studies, Business Administration, Law, or a related field\n- Minimum of 2-3 years' experience as a Legal Secretary, Administrative Assistant, or similar role\n- Experience working in a law firm is an advantage\n\n**Skills & Competencies:**\n- Excellent written and verbal communication skills\n- Proficiency in Microsoft Office Suite (Word, Excel, PowerPoint, Outlook)\n- Strong typing, transcription, and document formatting skills\n- Excellent organizational and time-management abilities\n- Strong attention to detail and accuracy\n- Ability to work under pressure and meet deadlines\n\n**Additional Requirements:**\n- Professional appearance and conduct\n- Strong interpersonal and customer service skills\n- Ability to work independently and as part of a team\n- Knowledge of court filing procedures is an added advantage\n\n**To Apply:** Send CV to office@rbnsolicitors.co.uk or call/WhatsApp +233 53 259 0556.",
       applyLink: "mailto:office@rbnsolicitors.co.uk",
       verified: true
     },
@@ -900,49 +779,125 @@
       title: "Student Photographer",
       company: "Penplusbytes",
       location: "Accra",
+      category: "Creative & Media",
+      region: "Greater Accra",
       type: "Paid, per event",
       salary: "Paid per event covered",
       posted: "24 Jun 2026",
       description: "Join Penplusbytes' creative support team covering events — paid per event, with gear, data, and portfolio-building included.",
-      fullDescription:
-        "Join the Penplusbytes creative support team and cover our events.\n\n" +
-        "**Pay & Perks:**\n" +
-        "- Paid per event covered\n" +
-        "- Data allowance\n" +
-        "- Event-branded items\n" +
-        "- Feeding during assignments\n" +
-        "- Portfolio-building experience\n\n" +
-        "**Requirements:**\n" +
-        "- Good photography skills\n" +
-        "- Great photo editing skills\n" +
-        "- Reliable and punctual\n" +
-        "- Able to cover events in Accra\n" +
-        "- Owns her or his own gadgets\n\n" +
-        "**Deadline:** 30th June, 2026.\n\n" +
-        "**To Apply:** Send your CV and sample photos/portfolio to info@penplusbytes.org.",
+      fullDescription: "Join the Penplusbytes creative support team and cover our events.\n\n**Pay & Perks:**\n- Paid per event covered\n- Data allowance\n- Event-branded items\n- Feeding during assignments\n- Portfolio-building experience\n\n**Requirements:**\n- Good photography skills\n- Great photo editing skills\n- Reliable and punctual\n- Able to cover events in Accra\n- Owns her or his own gadgets\n\n**Deadline:** 30th June, 2026.\n\n**To Apply:** Send your CV and sample photos/portfolio to info@penplusbytes.org.",
       applyLink: "mailto:info@penplusbytes.org",
       verified: true
     },
     {
-      title: "Multiple Teaching & Support Roles",
+      title: "Ghanaian Language Teacher (Twi and Ga)",
       company: "Dodi International School",
       location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "24 Jun 2026",
-      description: "Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
-      fullDescription:
-        "**Vacant Roles:**\n" +
-        "- Ghanaian Language Teacher (Twi and Ga)\n" +
-        "- Upper Primary Teacher (Maths and Science)\n" +
-        "- PE Teacher\n" +
-        "- Swim Teacher\n" +
-        "- Music Teacher\n" +
-        "- Drama Teacher\n" +
-        "- Mandarin Teacher\n" +
-        "- Customer Service & Print Centre Support\n\n" +
-        "**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n" +
-        "**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      applyLink: "mailto:jobs@dodiinternational.com",
+      verified: true
+    },
+    {
+      title: "Upper Primary Teacher (Maths and Science)",
+      company: "Dodi International School",
+      location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      applyLink: "mailto:jobs@dodiinternational.com",
+      verified: true
+    },
+    {
+      title: "PE Teacher",
+      company: "Dodi International School",
+      location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      applyLink: "mailto:jobs@dodiinternational.com",
+      verified: true
+    },
+    {
+      title: "Swim Teacher",
+      company: "Dodi International School",
+      location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      applyLink: "mailto:jobs@dodiinternational.com",
+      verified: true
+    },
+    {
+      title: "Music Teacher",
+      company: "Dodi International School",
+      location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      applyLink: "mailto:jobs@dodiinternational.com",
+      verified: true
+    },
+    {
+      title: "Drama Teacher",
+      company: "Dodi International School",
+      location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      applyLink: "mailto:jobs@dodiinternational.com",
+      verified: true
+    },
+    {
+      title: "Mandarin Teacher",
+      company: "Dodi International School",
+      location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
+      applyLink: "mailto:jobs@dodiinternational.com",
+      verified: true
+    },
+    {
+      title: "Customer Service & Print Centre Support",
+      company: "Dodi International School",
+      location: "Not stated",
+      category: "Customer Service",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "One of several open roles at Dodi International School. Several vacant roles including Ghanaian Language, Upper Primary, PE, Swim, Music, Drama, and Mandarin teachers, plus Customer Service & Print Centre Support.",
+      fullDescription: "**Vacant Roles:**\n- Ghanaian Language Teacher (Twi and Ga)\n- Upper Primary Teacher (Maths and Science)\n- PE Teacher\n- Swim Teacher\n- Music Teacher\n- Drama Teacher\n- Mandarin Teacher\n- Customer Service & Print Centre Support\n\n**Commitment to Diversity:** Dodi International School is an equal opportunity employer committed to fostering an inclusive campus environment. Qualified women are strongly encouraged to apply for the open Physical Education and Swimming Teaching positions.\n\n**To Apply:** Send your resume to jobs@dodiinternational.com, CC: hr@dodiinternational.com.",
       applyLink: "mailto:jobs@dodiinternational.com",
       verified: true
     },
@@ -950,25 +905,13 @@
       title: "Office Administrator / Personal Assistant",
       company: "BTC Sports Network",
       location: "Ashongman Estate",
+      category: "Admin & Office Support",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Handle office admin, scheduling, correspondence, and meeting coordination. Immediate employment available.",
-      fullDescription:
-        "**Immediate Employment Opportunity.**\n\n" +
-        "**Responsibilities:**\n" +
-        "- Office administration and record keeping\n" +
-        "- Managing schedules and appointments\n" +
-        "- Handling correspondence and communications\n" +
-        "- Supporting management with daily operations\n" +
-        "- Coordinating meetings and events\n\n" +
-        "**Requirements:**\n" +
-        "- Good communication skills\n" +
-        "- Strong organizational abilities\n" +
-        "- Proficiency in Microsoft Office applications\n" +
-        "- Ability to work independently and under pressure\n" +
-        "- Previous administrative experience is an advantage\n\n" +
-        "**To Apply:** Send your CV to btcsportnetwork@gmail.com.",
+      fullDescription: "**Immediate Employment Opportunity.**\n\n**Responsibilities:**\n- Office administration and record keeping\n- Managing schedules and appointments\n- Handling correspondence and communications\n- Supporting management with daily operations\n- Coordinating meetings and events\n\n**Requirements:**\n- Good communication skills\n- Strong organizational abilities\n- Proficiency in Microsoft Office applications\n- Ability to work independently and under pressure\n- Previous administrative experience is an advantage\n\n**To Apply:** Send your CV to btcsportnetwork@gmail.com.",
       applyLink: "mailto:btcsportnetwork@gmail.com",
       verified: true
     },
@@ -976,46 +919,55 @@
       title: "Female Receptionist",
       company: "Life is a Journey (Travel & Tour)",
       location: "Agape High Street, Ablekuma, Oduman, Greater Accra",
+      category: "Admin & Office Support",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Front-desk and client support role for a travel & tour company. Applicants from Ablekuma, Awoshie, Odorkor, or nearby areas have an advantage.",
-      fullDescription:
-        "Life is a Journey is looking for a professional, goal-driven, and enthusiastic Female Receptionist to become part of our team.\n\n" +
-        "**Requirements:**\n" +
-        "- Must be fluent in English (both spoken and written)\n" +
-        "- Must have excellent communication and customer service skills\n" +
-        "- Ability to host visitors and professionally answer client calls\n" +
-        "- Must be reliable, respectful, and well-presented\n\n" +
-        "Applicants living in the following areas will have an advantage: Ablekuma, Awoshie, Odorkor, and nearby communities.\n\n" +
-        "Only shortlisted candidates will be contacted.\n\n" +
-        "**Office Location:** Agape High Street Community, Area Ablekuma, Oduman, 128 District Ga Central, Greater Accra, Ghana.\n\n" +
-        "**To Apply:** Send your resume/CV to lifeisajourney561@gmail.com, or WhatsApp +233 54 576 7466 / +233 54 576 7081.",
+      fullDescription: "Life is a Journey is looking for a professional, goal-driven, and enthusiastic Female Receptionist to become part of our team.\n\n**Requirements:**\n- Must be fluent in English (both spoken and written)\n- Must have excellent communication and customer service skills\n- Ability to host visitors and professionally answer client calls\n- Must be reliable, respectful, and well-presented\n\nApplicants living in the following areas will have an advantage: Ablekuma, Awoshie, Odorkor, and nearby communities.\n\nOnly shortlisted candidates will be contacted.\n\n**Office Location:** Agape High Street Community, Area Ablekuma, Oduman, 128 District Ga Central, Greater Accra, Ghana.\n\n**To Apply:** Send your resume/CV to lifeisajourney561@gmail.com, or WhatsApp +233 54 576 7466 / +233 54 576 7081.",
       applyLink: "mailto:lifeisajourney561@gmail.com",
       verified: true
     },
     {
-      title: "Production Assistant, Customer Assistant & Interns",
+      title: "Production Assistant (Male)",
       company: "J Classy Wood & Artwork",
       location: "Not stated",
+      category: "Manufacturing & Production",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Multiple openings for a long-term career: Production Assistant (Male), Customer Assistant (Female), and Interns.",
-      fullDescription:
-        "We are looking for candidates who would build a long-term career with us.\n\n" +
-        "**Open Roles:**\n" +
-        "- Production Assistant - Male\n" +
-        "- Customer Assistant - Female\n" +
-        "- Interns\n\n" +
-        "**Requirements:**\n" +
-        "- Proven experience as a Graphic Designer or in a similar creative role\n" +
-        "- Proficiency in design software\n" +
-        "- Strong portfolio showcasing creative and diverse design work\n" +
-        "- Understanding of visual design principles, typography, and color theory\n" +
-        "- Must have a background in Sales and Marketing\n\n" +
-        "**To Apply:** Send your resume to jclassyhr@gmail.com.\n\n" +
-        "Note: the listing specifies gender for two of the roles — worth being aware of when sharing this one.",
+      fullDescription: "We are looking for candidates who would build a long-term career with us.\n\n**Open Roles:**\n- Production Assistant - Male\n- Customer Assistant - Female\n- Interns\n\n**Requirements:**\n- Proven experience as a Graphic Designer or in a similar creative role\n- Proficiency in design software\n- Strong portfolio showcasing creative and diverse design work\n- Understanding of visual design principles, typography, and color theory\n- Must have a background in Sales and Marketing\n\n**To Apply:** Send your resume to jclassyhr@gmail.com.\n\nNote: the listing specifies gender for two of the roles — worth being aware of when sharing this one.",
+      applyLink: "mailto:jclassyhr@gmail.com",
+      verified: false
+    },
+    {
+      title: "Customer Assistant (Female)",
+      company: "J Classy Wood & Artwork",
+      location: "Not stated",
+      category: "Customer Service",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Multiple openings for a long-term career: Production Assistant (Male), Customer Assistant (Female), and Interns.",
+      fullDescription: "We are looking for candidates who would build a long-term career with us.\n\n**Open Roles:**\n- Production Assistant - Male\n- Customer Assistant - Female\n- Interns\n\n**Requirements:**\n- Proven experience as a Graphic Designer or in a similar creative role\n- Proficiency in design software\n- Strong portfolio showcasing creative and diverse design work\n- Understanding of visual design principles, typography, and color theory\n- Must have a background in Sales and Marketing\n\n**To Apply:** Send your resume to jclassyhr@gmail.com.\n\nNote: the listing specifies gender for two of the roles — worth being aware of when sharing this one.",
+      applyLink: "mailto:jclassyhr@gmail.com",
+      verified: false
+    },
+    {
+      title: "Intern",
+      company: "J Classy Wood & Artwork",
+      location: "Not stated",
+      category: "Internships & National Service",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Multiple openings for a long-term career: Production Assistant (Male), Customer Assistant (Female), and Interns.",
+      fullDescription: "We are looking for candidates who would build a long-term career with us.\n\n**Open Roles:**\n- Production Assistant - Male\n- Customer Assistant - Female\n- Interns\n\n**Requirements:**\n- Proven experience as a Graphic Designer or in a similar creative role\n- Proficiency in design software\n- Strong portfolio showcasing creative and diverse design work\n- Understanding of visual design principles, typography, and color theory\n- Must have a background in Sales and Marketing\n\n**To Apply:** Send your resume to jclassyhr@gmail.com.\n\nNote: the listing specifies gender for two of the roles — worth being aware of when sharing this one.",
       applyLink: "mailto:jclassyhr@gmail.com",
       verified: false
     },
@@ -1023,42 +975,83 @@
       title: "Security Officer",
       company: "Not stated (MEGACORP)",
       location: "Tema",
+      category: "Security",
+      region: "Greater Accra",
       type: "Shift work",
       salary: "GH₵1,200/month + free accommodation",
       posted: "24 Jun 2026",
       description: "Urgent need for 2 security officers in Tema. No certificate required; free accommodation provided.",
-      fullDescription:
-        "2 Security Officers Needed Urgently.\n\n" +
-        "**Job Location:** Tema.\n\n" +
-        "**Requirements:**\n" +
-        "- Physically fit, alert, and disciplined\n" +
-        "- No certificate required\n\n" +
-        "**Benefits:**\n" +
-        "- Basic Salary: GH₵1,200/month\n" +
-        "- Salary increment after probation period\n" +
-        "- Ready to work shifts\n" +
-        "- Free accommodation, including nights\n\n" +
-        "**To Apply:** Call 0505596123 or WhatsApp +233 57 044 4260.\n\n" +
-        "Note: no company name beyond \"MEGACORP\" was given, and contact is phone/WhatsApp only — worth verifying who you're actually speaking to, especially before sharing any personal documents.",
+      fullDescription: "2 Security Officers Needed Urgently.\n\n**Job Location:** Tema.\n\n**Requirements:**\n- Physically fit, alert, and disciplined\n- No certificate required\n\n**Benefits:**\n- Basic Salary: GH₵1,200/month\n- Salary increment after probation period\n- Ready to work shifts\n- Free accommodation, including nights\n\n**To Apply:** Call 0505596123 or WhatsApp +233 57 044 4260.\n\nNote: no company name beyond \"MEGACORP\" was given, and contact is phone/WhatsApp only — worth verifying who you're actually speaking to, especially before sharing any personal documents.",
       applyLink: "tel:0505596123",
       verified: true
     },
     {
-      title: "Sous Chef, Chef de Partie, Commis Chef, Kitchen Steward & Pastry Chef",
+      title: "Sous Chef",
       company: "Belfast Africa",
       location: "Not stated",
+      category: "Hospitality & Food Service",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Belfast Africa is hiring across its Culinary Team for several kitchen roles.",
-      fullDescription:
-        "Belfast Africa is hiring for the following open roles for their Culinary Team:\n\n" +
-        "- Sous Chef\n" +
-        "- Chef de Partie\n" +
-        "- Commis Chef\n" +
-        "- Kitchen Steward\n" +
-        "- Pastry Chef\n\n" +
-        "**To Apply:** Send CV & cover letter to recruitment@belfastafrica.com.",
+      fullDescription: "Belfast Africa is hiring for the following open roles for their Culinary Team:\n\n- Sous Chef\n- Chef de Partie\n- Commis Chef\n- Kitchen Steward\n- Pastry Chef\n\n**To Apply:** Send CV & cover letter to recruitment@belfastafrica.com.",
+      applyLink: "mailto:recruitment@belfastafrica.com",
+      verified: false
+    },
+    {
+      title: "Chef de Partie",
+      company: "Belfast Africa",
+      location: "Not stated",
+      category: "Hospitality & Food Service",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Belfast Africa is hiring across its Culinary Team for several kitchen roles.",
+      fullDescription: "Belfast Africa is hiring for the following open roles for their Culinary Team:\n\n- Sous Chef\n- Chef de Partie\n- Commis Chef\n- Kitchen Steward\n- Pastry Chef\n\n**To Apply:** Send CV & cover letter to recruitment@belfastafrica.com.",
+      applyLink: "mailto:recruitment@belfastafrica.com",
+      verified: false
+    },
+    {
+      title: "Commis Chef",
+      company: "Belfast Africa",
+      location: "Not stated",
+      category: "Hospitality & Food Service",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Belfast Africa is hiring across its Culinary Team for several kitchen roles.",
+      fullDescription: "Belfast Africa is hiring for the following open roles for their Culinary Team:\n\n- Sous Chef\n- Chef de Partie\n- Commis Chef\n- Kitchen Steward\n- Pastry Chef\n\n**To Apply:** Send CV & cover letter to recruitment@belfastafrica.com.",
+      applyLink: "mailto:recruitment@belfastafrica.com",
+      verified: false
+    },
+    {
+      title: "Kitchen Steward",
+      company: "Belfast Africa",
+      location: "Not stated",
+      category: "Hospitality & Food Service",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Belfast Africa is hiring across its Culinary Team for several kitchen roles.",
+      fullDescription: "Belfast Africa is hiring for the following open roles for their Culinary Team:\n\n- Sous Chef\n- Chef de Partie\n- Commis Chef\n- Kitchen Steward\n- Pastry Chef\n\n**To Apply:** Send CV & cover letter to recruitment@belfastafrica.com.",
+      applyLink: "mailto:recruitment@belfastafrica.com",
+      verified: false
+    },
+    {
+      title: "Pastry Chef",
+      company: "Belfast Africa",
+      location: "Not stated",
+      category: "Hospitality & Food Service",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "24 Jun 2026",
+      description: "Belfast Africa is hiring across its Culinary Team for several kitchen roles.",
+      fullDescription: "Belfast Africa is hiring for the following open roles for their Culinary Team:\n\n- Sous Chef\n- Chef de Partie\n- Commis Chef\n- Kitchen Steward\n- Pastry Chef\n\n**To Apply:** Send CV & cover letter to recruitment@belfastafrica.com.",
       applyLink: "mailto:recruitment@belfastafrica.com",
       verified: false
     },
@@ -1066,19 +1059,13 @@
       title: "Customer Service Representative",
       company: "Djon Techtic",
       location: "Ho, Volta Region",
+      category: "Customer Service",
+      region: "Volta",
       type: "Not stated",
       salary: "Not stated",
       posted: "24 Jun 2026",
       description: "Handle phone-based customer service for a growing team in Ho. No certificate required.",
-      fullDescription:
-        "We are looking for a Customer Service Representative to join our growing team.\n\n" +
-        "**Requirements:**\n" +
-        "- No certificate required\n" +
-        "- Good communication skills\n" +
-        "- Able to handle phone calls\n" +
-        "- Administrative experience is an added advantage\n\n" +
-        "**Location:** Volta Region (Ho).\n\n" +
-        "**To Apply:** Send your CV to gracentiriwaa13@gmail.com or WhatsApp 0549808358.",
+      fullDescription: "We are looking for a Customer Service Representative to join our growing team.\n\n**Requirements:**\n- No certificate required\n- Good communication skills\n- Able to handle phone calls\n- Administrative experience is an added advantage\n\n**Location:** Volta Region (Ho).\n\n**To Apply:** Send your CV to gracentiriwaa13@gmail.com or WhatsApp 0549808358.",
       applyLink: "mailto:gracentiriwaa13@gmail.com",
       verified: true
     },
@@ -1086,12 +1073,13 @@
       title: "Graphic Designer",
       company: "Agrokings",
       location: "Not stated",
+      category: "Creative & Media",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "25 Jun 2026",
       description: "Send your CV and cover letter to apply for this graphic design role.",
-      fullDescription:
-        "**To Apply:** Send your CV and cover letter to hr@agrokings.io.",
+      fullDescription: "**To Apply:** Send your CV and cover letter to hr@agrokings.io.",
       applyLink: "mailto:hr@agrokings.io",
       verified: true
     },
@@ -1099,30 +1087,13 @@
       title: "Quality Assurance Officer",
       company: "Nationwide Medical Insurance",
       location: "Not stated",
+      category: "Healthcare",
+      region: "Region not stated",
       type: "Full-time",
       salary: "Not stated",
       posted: "25 Jun 2026",
       description: "Monitor, evaluate, and enhance service quality across departments, ensuring compliance with regulations and customer service standards.",
-      fullDescription:
-        "**Position Summary:** The QA Officer will monitor, evaluate, and enhance service quality across departments, ensuring compliance with regulations, internal policies, and customer service standards.\n\n" +
-        "**Key Responsibilities:**\n" +
-        "- Monitor and evaluate customer service interactions to ensure compliance and service excellence\n" +
-        "- Monitor employees' engagement with health service providers based on established standards\n" +
-        "- Conduct regular audits of operational activities across the various departments\n" +
-        "- Conduct surveys on services provided by both the organization as well as its partners\n" +
-        "- Analyze data to identify trends and areas for improvement\n" +
-        "- Conduct debrief sessions for assigned departments based on the regular audits\n" +
-        "- Prepare and submit weekly reports based on audits and surveys conducted\n" +
-        "- Perform any other Quality Assurance related tasks that may be assigned from time to time\n\n" +
-        "**Qualifications and Requirements:**\n" +
-        "- Bachelor's degree in a relevant field (e.g. Quality Management, Insurance, Business, Law, IT)\n" +
-        "- 1-2 years' experience in a similar role, ideally in insurance\n" +
-        "- Strong analytical, communication, report-writing, and problem-solving skills with keen attention to detail\n" +
-        "- Proficient in Microsoft Office and QA software\n" +
-        "- Familiarity with Ghanaian health insurance and general insurance regulations is an advantage\n" +
-        "- Knowledge of claims, health service provider, and customer service operations is an added plus\n\n" +
-        "**Application Deadline:** 26th June, 2026.\n\n" +
-        "**To Apply:** https://careers.nationwideapps.com",
+      fullDescription: "**Position Summary:** The QA Officer will monitor, evaluate, and enhance service quality across departments, ensuring compliance with regulations, internal policies, and customer service standards.\n\n**Key Responsibilities:**\n- Monitor and evaluate customer service interactions to ensure compliance and service excellence\n- Monitor employees' engagement with health service providers based on established standards\n- Conduct regular audits of operational activities across the various departments\n- Conduct surveys on services provided by both the organization as well as its partners\n- Analyze data to identify trends and areas for improvement\n- Conduct debrief sessions for assigned departments based on the regular audits\n- Prepare and submit weekly reports based on audits and surveys conducted\n- Perform any other Quality Assurance related tasks that may be assigned from time to time\n\n**Qualifications and Requirements:**\n- Bachelor's degree in a relevant field (e.g. Quality Management, Insurance, Business, Law, IT)\n- 1-2 years' experience in a similar role, ideally in insurance\n- Strong analytical, communication, report-writing, and problem-solving skills with keen attention to detail\n- Proficient in Microsoft Office and QA software\n- Familiarity with Ghanaian health insurance and general insurance regulations is an advantage\n- Knowledge of claims, health service provider, and customer service operations is an added plus\n\n**Application Deadline:** 26th June, 2026.\n\n**To Apply:** https://careers.nationwideapps.com",
       applyLink: "https://careers.nationwideapps.com",
       verified: true
     },
@@ -1130,25 +1101,13 @@
       title: "Sales Executive",
       company: "Not stated",
       location: "Accra",
+      category: "Sales & Business Development",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "Not stated, plus commissions & incentives",
       posted: "25 Jun 2026",
       description: "Build a sales career with training, mentorship, and attractive commissions. Age 25+ required.",
-      fullDescription:
-        "Build a rewarding career. Make impact. Grow. Succeed.\n\n" +
-        "Join a dynamic team where your ambition is valued, your growth is supported, and your success is rewarded every step of the way.\n\n" +
-        "**Requirements:**\n" +
-        "- SHS or Tertiary Certificate\n" +
-        "- Age 25 years and above\n" +
-        "- Good communication skills\n" +
-        "- Tech-savvy\n" +
-        "- Strong passion for sales\n\n" +
-        "**Why Join Us:**\n" +
-        "- Career growth opportunities\n" +
-        "- Professional training & mentorship\n" +
-        "- Attractive commissions & incentives\n" +
-        "- Supportive and professional work environment\n\n" +
-        "**To Apply:** Email dorisfosu010@gmail.com or WhatsApp CV to 054 033 7436.",
+      fullDescription: "Build a rewarding career. Make impact. Grow. Succeed.\n\nJoin a dynamic team where your ambition is valued, your growth is supported, and your success is rewarded every step of the way.\n\n**Requirements:**\n- SHS or Tertiary Certificate\n- Age 25 years and above\n- Good communication skills\n- Tech-savvy\n- Strong passion for sales\n\n**Why Join Us:**\n- Career growth opportunities\n- Professional training & mentorship\n- Attractive commissions & incentives\n- Supportive and professional work environment\n\n**To Apply:** Email dorisfosu010@gmail.com or WhatsApp CV to 054 033 7436.",
       applyLink: "mailto:dorisfosu010@gmail.com",
       verified: true
     },
@@ -1156,16 +1115,13 @@
       title: "Teachers Needed",
       company: "Talent Scout GH",
       location: "Kasoa and its environs",
+      category: "Education",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "Not stated",
       posted: "25 Jun 2026",
       description: "Teaching roles available. Candidates close to Kasoa and its environs are preferred.",
-      fullDescription:
-        "Talent Scout GH is recruiting teachers. Candidates residing close to Kasoa and its environs are preferred for this role.\n\n" +
-        "**To Apply / Contact:**\n" +
-        "- Call: 024 396 6248\n" +
-        "- Email: info@talentscoutgh.com\n" +
-        "- Website: www.talentscoutgh.com",
+      fullDescription: "Talent Scout GH is recruiting teachers. Candidates residing close to Kasoa and its environs are preferred for this role.\n\n**To Apply / Contact:**\n- Call: 024 396 6248\n- Email: info@talentscoutgh.com\n- Website: www.talentscoutgh.com",
       applyLink: "mailto:info@talentscoutgh.com",
       verified: true
     },
@@ -1173,20 +1129,13 @@
       title: "Preschool Teacher",
       company: "Oak of Honour Nursery",
       location: "Not stated",
+      category: "Education",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "25 Jun 2026",
       description: "International preschool seeking experienced teachers with Cambridge, EYFS, or Montessori knowledge. French + English a strong plus.",
-      fullDescription:
-        "Are you passionate about working with young children and building strong connections with their parents? Do you thrive in a dynamic, international learning environment? If yes, we want you on our team!\n\n" +
-        "**What We Are Looking For:**\n" +
-        "- Experience: Minimum of 5 years working in an international preschool\n" +
-        "- Curriculum Knowledge: Strong understanding of Cambridge, EYFS, or Montessori frameworks\n" +
-        "- Language Skills: Ability to speak both French and English is a distinct advantage\n" +
-        "- Passion: A genuine love for early childhood education and excellent communication skills with parents\n\n" +
-        "**Our Mission:** Cultivate a lifelong love of learning, foster global citizens, support teacher growth & professional development.\n\n" +
-        "**Our Campus:** State-of-the-art learning spaces; safe, secure, and nurturing campus.\n\n" +
-        "**To Apply:** Send your CV to oakofhonournursery@yahoo.com.",
+      fullDescription: "Are you passionate about working with young children and building strong connections with their parents? Do you thrive in a dynamic, international learning environment? If yes, we want you on our team!\n\n**What We Are Looking For:**\n- Experience: Minimum of 5 years working in an international preschool\n- Curriculum Knowledge: Strong understanding of Cambridge, EYFS, or Montessori frameworks\n- Language Skills: Ability to speak both French and English is a distinct advantage\n- Passion: A genuine love for early childhood education and excellent communication skills with parents\n\n**Our Mission:** Cultivate a lifelong love of learning, foster global citizens, support teacher growth & professional development.\n\n**Our Campus:** State-of-the-art learning spaces; safe, secure, and nurturing campus.\n\n**To Apply:** Send your CV to oakofhonournursery@yahoo.com.",
       applyLink: "mailto:oakofhonournursery@yahoo.com",
       verified: true
     },
@@ -1194,35 +1143,13 @@
       title: "Regional Research & Data Collection Officer",
       company: "Cocoa360",
       location: "Based in Ghana, with frequent travel across Africa",
+      category: "Research & Data",
+      region: "Anywhere / Remote",
       type: "Not stated",
       salary: "Not stated",
       posted: "25 Jun 2026",
       description: "Lead and coordinate field data collection across multiple African countries for Cocoa360's research and impact assessment initiatives.",
-      fullDescription:
-        "**About Cocoa360:** At Cocoa360, we are pioneering a self-sustaining model of rural development that leverages existing community resources to improve access to education and healthcare for Ghana's 1.6 million+ cocoa farmers - without long-term reliance on foreign aid. Our Farm-for-Impact model puts cocoa farmers in the driver's seat, partnering with rural communities to invest community-generated revenue in key educational and healthcare improvements.\n\n" +
-        "**Reports to:** Research Manager / Head of Research.\n\n" +
-        "**Position Summary:** Lead and coordinate field data collection across multiple African countries in support of Cocoa360's research, monitoring, evaluation and impact assessment initiatives. The role requires extensive travel and close collaboration with local research partners, enumerators, government agencies, healthcare facilities, schools and community stakeholders - ensuring all activities comply with approved protocols, ethical standards and applicable local regulations.\n\n" +
-        "**Key Responsibilities:**\n" +
-        "- Plan & coordinate data collection across assigned African countries\n" +
-        "- Travel to project sites to oversee field operations\n" +
-        "- Supervise local data collectors, research assistants & partner organizations\n" +
-        "- Coordinate IRB / ethics approvals with committees, ministries & regulators\n" +
-        "- Train & mentor field teams on methods, informed consent & confidentiality\n" +
-        "- Monitor data quality through verification, spot checks & validation\n" +
-        "- Prepare field reports, progress updates & documentation\n" +
-        "- Coordinate logistics and ensure secure handling & storage of research data\n" +
-        "- Build relationships with agencies, clinics, schools & community leaders\n\n" +
-        "**Qualifications:**\n" +
-        "- Degree in Public Health, Statistics, Development Studies, Social or Health Sciences, Economics or Research Methods\n" +
-        "- A master's degree is an added advantage\n" +
-        "- Experience coordinating field research or data collection across multiple locations\n" +
-        "- Familiarity with research ethics & obtaining approvals in international settings\n" +
-        "- Strong project coordination & stakeholder management skills\n" +
-        "- Proven ability to supervise field teams & ensure data quality\n" +
-        "- Excellent written & verbal English; additional African languages an advantage\n" +
-        "- Strong analytical, organizational & problem-solving skills\n\n" +
-        "**Deadline:** Mon, 29 June 2026.\n\n" +
-        "**To Apply:** Send your CV and cover letter to apply@cocoa360.org with the subject line \"Regional Research & Data Collection Officer\".",
+      fullDescription: "**About Cocoa360:** At Cocoa360, we are pioneering a self-sustaining model of rural development that leverages existing community resources to improve access to education and healthcare for Ghana's 1.6 million+ cocoa farmers - without long-term reliance on foreign aid. Our Farm-for-Impact model puts cocoa farmers in the driver's seat, partnering with rural communities to invest community-generated revenue in key educational and healthcare improvements.\n\n**Reports to:** Research Manager / Head of Research.\n\n**Position Summary:** Lead and coordinate field data collection across multiple African countries in support of Cocoa360's research, monitoring, evaluation and impact assessment initiatives. The role requires extensive travel and close collaboration with local research partners, enumerators, government agencies, healthcare facilities, schools and community stakeholders - ensuring all activities comply with approved protocols, ethical standards and applicable local regulations.\n\n**Key Responsibilities:**\n- Plan & coordinate data collection across assigned African countries\n- Travel to project sites to oversee field operations\n- Supervise local data collectors, research assistants & partner organizations\n- Coordinate IRB / ethics approvals with committees, ministries & regulators\n- Train & mentor field teams on methods, informed consent & confidentiality\n- Monitor data quality through verification, spot checks & validation\n- Prepare field reports, progress updates & documentation\n- Coordinate logistics and ensure secure handling & storage of research data\n- Build relationships with agencies, clinics, schools & community leaders\n\n**Qualifications:**\n- Degree in Public Health, Statistics, Development Studies, Social or Health Sciences, Economics or Research Methods\n- A master's degree is an added advantage\n- Experience coordinating field research or data collection across multiple locations\n- Familiarity with research ethics & obtaining approvals in international settings\n- Strong project coordination & stakeholder management skills\n- Proven ability to supervise field teams & ensure data quality\n- Excellent written & verbal English; additional African languages an advantage\n- Strong analytical, organizational & problem-solving skills\n\n**Deadline:** Mon, 29 June 2026.\n\n**To Apply:** Send your CV and cover letter to apply@cocoa360.org with the subject line \"Regional Research & Data Collection Officer\".",
       applyLink: "mailto:apply@cocoa360.org",
       verified: true
     },
@@ -1230,17 +1157,13 @@
       title: "Territory Manager",
       company: "Petrosol",
       location: "Anywhere in Ghana (must be willing to relocate)",
+      category: "Sales & Business Development",
+      region: "Anywhere / Remote",
       type: "Permanent, Full-time",
       salary: "Attractive and competitive",
       posted: "25 Jun 2026",
       description: "Lead staff and own key performance indicators (sales volume, market share, compliance, profitability) for an assigned territory.",
-      fullDescription:
-        "The Territory Manager shall provide effective leadership for staff within the territory and have accountability for the achievement of key performance indicators for the entire territory such as sales volume (fuels, lubes and non-fuel revenue business), market share, receivables, regulatory compliance and profitability.\n\n" +
-        "**Job Type:** Permanent, Full-time.\n" +
-        "**Location:** Should be willing to move to any region in Ghana.\n" +
-        "**Total Compensation:** Attractive and Competitive.\n\n" +
-        "**Deadline:** 7th July, 2026.\n\n" +
-        "**To Apply:** Submit your updated CV and application letter to recruitment@petrosol.com.gh with the subject line \"TERRITORY MANAGER\". Only successful applicants will be contacted, 2 weeks after the deadline.",
+      fullDescription: "The Territory Manager shall provide effective leadership for staff within the territory and have accountability for the achievement of key performance indicators for the entire territory such as sales volume (fuels, lubes and non-fuel revenue business), market share, receivables, regulatory compliance and profitability.\n\n**Job Type:** Permanent, Full-time.\n**Location:** Should be willing to move to any region in Ghana.\n**Total Compensation:** Attractive and Competitive.\n\n**Deadline:** 7th July, 2026.\n\n**To Apply:** Submit your updated CV and application letter to recruitment@petrosol.com.gh with the subject line \"TERRITORY MANAGER\". Only successful applicants will be contacted, 2 weeks after the deadline.",
       applyLink: "mailto:recruitment@petrosol.com.gh",
       verified: true
     },
@@ -1248,24 +1171,13 @@
       title: "Voluntary Internship - Software Engineering, Cybersecurity, UI/UX, Data Analytics, Digital Marketing & Finance",
       company: "AmaliTech",
       location: "Ghana (Accra, Takoradi, or Kumasi)",
+      category: "IT & Software",
+      region: "Greater Accra",
       type: "Onsite or Remote, Full-time (40 hrs/week), Unpaid",
       salary: "Unpaid (structured internship)",
       posted: "25 Jun 2026",
       description: "Six-week voluntary internship for Ghanaian tertiary students/graduates. Cohort 3 (Aug-Sept) open to all; Cohort 4 (Oct-Nov) for women and PWDs only.",
-      fullDescription:
-        "Applications are open for the Third and Fourth Cohorts of the AmaliTech Voluntary Internship (AVI)!\n\n" +
-        "The AmaliTech Voluntary Internship (AVI) is a six-week programme designed for tertiary students and graduates ready to move beyond the classroom and into a real professional environment.\n\n" +
-        "**Cohorts:**\n" +
-        "- Third Cohort: August to September, open to all eligible applicants\n" +
-        "- Fourth Cohort: October to November, exclusively for females and persons with disabilities (PWDs)\n\n" +
-        "**Specialisations:** Software Engineering, Cybersecurity, UI/UX Design, Data Analytics, Digital Marketing, Finance.\n\n" +
-        "**Eligibility:**\n" +
-        "- Must be a Ghanaian tertiary student or graduate\n" +
-        "- Should be studying or have studied a programme relevant to the chosen specialisation\n" +
-        "- Must be at least 18 years old\n" +
-        "- Must not be currently working (engaged in any type of employment)\n\n" +
-        "Interns gain structured experience, guided mentorship, and professional networking opportunities, working onsite or remotely across AmaliTech's Ghana offices. Commitment: full-time, 40 hours per week.\n\n" +
-        "**To Apply:** https://amalitech.com/voluntary-internship/",
+      fullDescription: "Applications are open for the Third and Fourth Cohorts of the AmaliTech Voluntary Internship (AVI)!\n\nThe AmaliTech Voluntary Internship (AVI) is a six-week programme designed for tertiary students and graduates ready to move beyond the classroom and into a real professional environment.\n\n**Cohorts:**\n- Third Cohort: August to September, open to all eligible applicants\n- Fourth Cohort: October to November, exclusively for females and persons with disabilities (PWDs)\n\n**Specialisations:** Software Engineering, Cybersecurity, UI/UX Design, Data Analytics, Digital Marketing, Finance.\n\n**Eligibility:**\n- Must be a Ghanaian tertiary student or graduate\n- Should be studying or have studied a programme relevant to the chosen specialisation\n- Must be at least 18 years old\n- Must not be currently working (engaged in any type of employment)\n\nInterns gain structured experience, guided mentorship, and professional networking opportunities, working onsite or remotely across AmaliTech's Ghana offices. Commitment: full-time, 40 hours per week.\n\n**To Apply:** https://amalitech.com/voluntary-internship/",
       applyLink: "https://amalitech.com/voluntary-internship/",
       verified: true
     },
@@ -1273,26 +1185,13 @@
       title: "Community & Channel Manager",
       company: "Bingo Africa",
       location: "Accra",
+      category: "Marketing & Communications",
+      region: "Greater Accra",
       type: "2 openings, start TBC",
       salary: "Not stated",
       posted: "25 Jun 2026",
       description: "Build and sustain an active Bingo Africa community across WhatsApp, Telegram, and social media with a 16-hour daily coverage window.",
-      fullDescription:
-        "Build and sustain an active, warm, trusted Bingo Africa community across WhatsApp, Telegram and social media; fast, human engagement across a 16-hour daily coverage window.\n\n" +
-        "**2 Openings.** Start: To be communicated.\n\n" +
-        "**What You'll Do:**\n" +
-        "- Moderate WhatsApp & Telegram channels on rotating 8-hour shifts, 7 days a week\n" +
-        "- Respond to players in English, Twi & Pidgin using the approved playbook\n" +
-        "- Post daily content: jackpot alerts, winner shoutouts, game tips & how-to-play guides\n" +
-        "- Run \"Learn to Play\" sessions and triage player issues for escalation\n" +
-        "- Join BTL activations across Accra to seed location-specific community groups\n\n" +
-        "**What We're Looking For:**\n" +
-        "- Social-media native with strong written communication\n" +
-        "- Fluent in English plus Twi or Pidgin\n" +
-        "- Calm under pressure, comfortable running multiple platforms on mobile\n" +
-        "- Prior community moderation experience for a brand is a strong plus\n\n" +
-        "**Deadline:** 26th June 2026.\n\n" +
-        "**To Apply:** Send your CV to socialba.ghana@lvt.games.",
+      fullDescription: "Build and sustain an active, warm, trusted Bingo Africa community across WhatsApp, Telegram and social media; fast, human engagement across a 16-hour daily coverage window.\n\n**2 Openings.** Start: To be communicated.\n\n**What You'll Do:**\n- Moderate WhatsApp & Telegram channels on rotating 8-hour shifts, 7 days a week\n- Respond to players in English, Twi & Pidgin using the approved playbook\n- Post daily content: jackpot alerts, winner shoutouts, game tips & how-to-play guides\n- Run \"Learn to Play\" sessions and triage player issues for escalation\n- Join BTL activations across Accra to seed location-specific community groups\n\n**What We're Looking For:**\n- Social-media native with strong written communication\n- Fluent in English plus Twi or Pidgin\n- Calm under pressure, comfortable running multiple platforms on mobile\n- Prior community moderation experience for a brand is a strong plus\n\n**Deadline:** 26th June 2026.\n\n**To Apply:** Send your CV to socialba.ghana@lvt.games.",
       applyLink: "mailto:socialba.ghana@lvt.games",
       verified: true
     },
@@ -1300,27 +1199,13 @@
       title: "Content Creator & Videographer",
       company: "Bingo Africa",
       location: "Accra",
+      category: "Creative & Media",
+      region: "Greater Accra",
       type: "1 opening, start TBC",
       salary: "Not stated",
       posted: "25 Jun 2026",
       description: "Produce culturally resonant short-form video for the Bingo Africa brand across TikTok, Reels, Facebook & YouTube.",
-      fullDescription:
-        "Produce culturally resonant short-form video that builds the Bingo Africa brand, teaches players how to play, and celebrates the community across TikTok, Reels, Facebook & YouTube.\n\n" +
-        "**1 Opening.** Start: To be communicated.\n\n" +
-        "**What You'll Do:**\n" +
-        "- Concept, film & edit short-form video for a young Ghanaian audience (18-35)\n" +
-        "- Produce the \"Learn to Play\" video library in English, Twi & Pidgin\n" +
-        "- Capture winner celebrations, jackpot countdowns & launch event footage\n" +
-        "- Keep formats fresh, stay on-trend with TikTok & Reels in Ghana\n" +
-        "- Attend activations and the launch event for real-time content turnaround\n\n" +
-        "**What We're Looking For:**\n" +
-        "- Confident on camera and behind it\n" +
-        "- Can use a professional camera\n" +
-        "- Skilled in videography and mobile filmmaker/editor (CapCut or similar)\n" +
-        "- Sharp instinct for what performs on TikTok & Reels in Ghana\n" +
-        "- Fast-moving creative who can ship multiple pieces a week\n\n" +
-        "**Deadline:** 26th June 2026.\n\n" +
-        "**To Apply:** Send your CV to socialba.ghana@lvt.games.",
+      fullDescription: "Produce culturally resonant short-form video that builds the Bingo Africa brand, teaches players how to play, and celebrates the community across TikTok, Reels, Facebook & YouTube.\n\n**1 Opening.** Start: To be communicated.\n\n**What You'll Do:**\n- Concept, film & edit short-form video for a young Ghanaian audience (18-35)\n- Produce the \"Learn to Play\" video library in English, Twi & Pidgin\n- Capture winner celebrations, jackpot countdowns & launch event footage\n- Keep formats fresh, stay on-trend with TikTok & Reels in Ghana\n- Attend activations and the launch event for real-time content turnaround\n\n**What We're Looking For:**\n- Confident on camera and behind it\n- Can use a professional camera\n- Skilled in videography and mobile filmmaker/editor (CapCut or similar)\n- Sharp instinct for what performs on TikTok & Reels in Ghana\n- Fast-moving creative who can ship multiple pieces a week\n\n**Deadline:** 26th June 2026.\n\n**To Apply:** Send your CV to socialba.ghana@lvt.games.",
       applyLink: "mailto:socialba.ghana@lvt.games",
       verified: true
     },
@@ -1328,37 +1213,13 @@
       title: "Territory Sales Supervisor",
       company: "Global Talent Masters (GTM), for a manufacturing client",
       location: "Cape Coast / Takoradi / Obuasi / Kumasi",
+      category: "Sales & Business Development",
+      region: "Ashanti",
       type: "Full-time",
       salary: "GHC 4,500 - 7,000 + benefits",
       posted: "26 Jun 2026",
       description: "Manage all sales activities within a defined territory for a tomato paste manufacturer, including recruiting customers, logistics, and field audits.",
-      fullDescription:
-        "**Sector:** Manufacturing.\n\n" +
-        "**Job Overview:** Seeking to recruit a Territory Sales Supervisor to be responsible for managing all sales activities within a defined geographical territory.\n\n" +
-        "**Responsibilities:**\n" +
-        "- Identifying, recruiting customers in Ghana for various tomato paste categories\n" +
-        "- Finalizing orders, overseeing payments, supervising and coordinating complete logistics\n" +
-        "- Identifying sales avenues and assisting customers with secondary sales of the products\n" +
-        "- Conducting market research/surveys to collect market pluses, pricing and other data to aid business decisions\n" +
-        "- Compiling daily/weekly/monthly reports in Excel and PowerPoint\n" +
-        "- Achieving sales targets/objectives on a monthly/quarterly/annual basis\n" +
-        "- Monitoring sales trends and recommending changes in sales or marketing approach\n" +
-        "- Maintaining and growing distribution of company products across medical institutions and pharmaceutical outlets in the territory\n" +
-        "- Ensuring maximum visibility and presence of brands using available Point of Sale materials\n" +
-        "- Reconciling all disputes relating to customer account transactions\n" +
-        "- Conducting field audits in the territory to verify reports from sales representatives and confirm compliance to call standards\n" +
-        "- Managing stock movement to avoid mismatches\n" +
-        "- Analysing competitor activities and assessing opportunities for business development\n\n" +
-        "**Qualifications & Skills:**\n" +
-        "- Degree in Business areas such as Sales, Management, Marketing, or Economics\n" +
-        "- Minimum 4 years' experience as a Territory Sales Supervisor/Manager, relevant industry background from a competitor or related industry\n" +
-        "- Good knowledge of the FMCG landscape of Ghana\n" +
-        "- Good knowledge of the Tomato Paste category\n" +
-        "- Good in Excel and reporting skills\n" +
-        "- Excellent communication skills\n\n" +
-        "**Salary Package:** Net salary of GHC 4,500 - 7,000, plus competitive benefits commensurate with experience.\n\n" +
-        "**Apply Before:** 30th June, 2026.\n\n" +
-        "**To Apply:** Email CV to ransford@globaltalentmasters.com or info@globaltalentmasters.com, or WhatsApp 0244 218 566.",
+      fullDescription: "**Sector:** Manufacturing.\n\n**Job Overview:** Seeking to recruit a Territory Sales Supervisor to be responsible for managing all sales activities within a defined geographical territory.\n\n**Responsibilities:**\n- Identifying, recruiting customers in Ghana for various tomato paste categories\n- Finalizing orders, overseeing payments, supervising and coordinating complete logistics\n- Identifying sales avenues and assisting customers with secondary sales of the products\n- Conducting market research/surveys to collect market pluses, pricing and other data to aid business decisions\n- Compiling daily/weekly/monthly reports in Excel and PowerPoint\n- Achieving sales targets/objectives on a monthly/quarterly/annual basis\n- Monitoring sales trends and recommending changes in sales or marketing approach\n- Maintaining and growing distribution of company products across medical institutions and pharmaceutical outlets in the territory\n- Ensuring maximum visibility and presence of brands using available Point of Sale materials\n- Reconciling all disputes relating to customer account transactions\n- Conducting field audits in the territory to verify reports from sales representatives and confirm compliance to call standards\n- Managing stock movement to avoid mismatches\n- Analysing competitor activities and assessing opportunities for business development\n\n**Qualifications & Skills:**\n- Degree in Business areas such as Sales, Management, Marketing, or Economics\n- Minimum 4 years' experience as a Territory Sales Supervisor/Manager, relevant industry background from a competitor or related industry\n- Good knowledge of the FMCG landscape of Ghana\n- Good knowledge of the Tomato Paste category\n- Good in Excel and reporting skills\n- Excellent communication skills\n\n**Salary Package:** Net salary of GHC 4,500 - 7,000, plus competitive benefits commensurate with experience.\n\n**Apply Before:** 30th June, 2026.\n\n**To Apply:** Email CV to ransford@globaltalentmasters.com or info@globaltalentmasters.com, or WhatsApp 0244 218 566.",
       applyLink: "mailto:ransford@globaltalentmasters.com",
       verified: true
     },
@@ -1366,25 +1227,13 @@
       title: "Temporal & Internship Opportunities 2026",
       company: "Letshego Bank",
       location: "Not stated",
+      category: "Internships & National Service",
+      region: "Region not stated",
       type: "Fixed Term & Internship",
       salary: "Market-related compensation",
       posted: "26 Jun 2026",
       description: "Launch your career with real-world banking experience across multiple departments — Risk, Audit, Finance, Credit, IT, Sales, Marketing, Legal and more.",
-      fullDescription:
-        "Launch Your Career With Us - Temporal and Internship Opportunities 2026 (Fixed Term and Internships).\n\n" +
-        "**What's on Offer:**\n" +
-        "- Real-world banking experience\n" +
-        "- Multi-department exposure\n" +
-        "- Mentorship & career growth\n" +
-        "- Market related compensation\n\n" +
-        "**Open Departments** (submit your CV for the area(s) you are interested in): Risk, Governance & Compliance; People & Culture; Audit; Finance; Credit; IT/Operations; Sales & Distribution; Marketing & Comms; Legal.\n\n" +
-        "**How to Apply:**\n" +
-        "- Submit CV + preferred department\n" +
-        "- Added to talent database\n" +
-        "- Shortlisted candidates contacted\n\n" +
-        "**Closing Date:** 10 July 2026. People from designated groups and persons with disabilities are encouraged to apply. Submitting your CV does not guarantee placement. Only shortlisted candidates will be contacted.\n\n" +
-        "**To Apply:** https://letshego.seamlesshiring.com/admin/advanced#/jobs\n\n" +
-        "Note: this listing reached us via a shared social media post rather than directly from Letshego's own channels — worth confirming the application link independently before applying.",
+      fullDescription: "Launch Your Career With Us - Temporal and Internship Opportunities 2026 (Fixed Term and Internships).\n\n**What's on Offer:**\n- Real-world banking experience\n- Multi-department exposure\n- Mentorship & career growth\n- Market related compensation\n\n**Open Departments** (submit your CV for the area(s) you are interested in): Risk, Governance & Compliance; People & Culture; Audit; Finance; Credit; IT/Operations; Sales & Distribution; Marketing & Comms; Legal.\n\n**How to Apply:**\n- Submit CV + preferred department\n- Added to talent database\n- Shortlisted candidates contacted\n\n**Closing Date:** 10 July 2026. People from designated groups and persons with disabilities are encouraged to apply. Submitting your CV does not guarantee placement. Only shortlisted candidates will be contacted.\n\n**To Apply:** https://letshego.seamlesshiring.com/admin/advanced#/jobs\n\nNote: this listing reached us via a shared social media post rather than directly from Letshego's own channels — worth confirming the application link independently before applying.",
       applyLink: "https://letshego.seamlesshiring.com/admin/advanced#/jobs",
       verified: false
     },
@@ -1392,24 +1241,13 @@
       title: "Driver",
       company: "Talent Scout GH",
       location: "Sakumono and its environs",
+      category: "Driving & Transport",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "GHS 2,000 - 3,000",
       posted: "26 Jun 2026",
       description: "Safely transport staff, clients, and company materials. Must reside within Sakumono and its environs, minimum 3 years driving experience.",
-      fullDescription:
-        "**Must reside within Sakumono and its environs.**\n\n" +
-        "**Key Responsibilities:**\n" +
-        "- Safely transport staff, clients, and company materials to designated locations\n" +
-        "- Ensure timely pick-ups and drop-off of personnel and deliveries\n" +
-        "- Adhere to all traffic regulations and company policies\n" +
-        "- Keep vehicle clean and in good condition\n\n" +
-        "**Requirements:**\n" +
-        "- Valid driver's license\n" +
-        "- Good knowledge of routes\n" +
-        "- Honest, reliable & punctual\n" +
-        "- Minimum of 3 years driving experience\n\n" +
-        "**Salary Range:** GHS 2,000 - 3,000.\n\n" +
-        "**To Apply:** Send your CV to info@talentscoutgh.com, or call/WhatsApp 0243 966 248. Website: www.talentscoutgh.com.",
+      fullDescription: "**Must reside within Sakumono and its environs.**\n\n**Key Responsibilities:**\n- Safely transport staff, clients, and company materials to designated locations\n- Ensure timely pick-ups and drop-off of personnel and deliveries\n- Adhere to all traffic regulations and company policies\n- Keep vehicle clean and in good condition\n\n**Requirements:**\n- Valid driver's license\n- Good knowledge of routes\n- Honest, reliable & punctual\n- Minimum of 3 years driving experience\n\n**Salary Range:** GHS 2,000 - 3,000.\n\n**To Apply:** Send your CV to info@talentscoutgh.com, or call/WhatsApp 0243 966 248. Website: www.talentscoutgh.com.",
       applyLink: "mailto:info@talentscoutgh.com",
       verified: true
     },
@@ -1417,27 +1255,13 @@
       title: "National Service Opportunity",
       company: "Universal Merchant Bank (UMB)",
       location: "Not stated",
+      category: "Internships & National Service",
+      region: "Region not stated",
       type: "National Service",
       salary: "Not stated",
       posted: "26 Jun 2026",
       description: "Undertake your National Service with one of Ghana's leading indigenous banks, with hands-on banking experience and mentorship.",
-      fullDescription:
-        "Your Future Starts Here. Ready to Begin Your Career Journey with One of Ghana's Leading Indigenous Banks? Universal Merchant Bank Ltd invites applications from qualified and motivated graduates seeking to undertake their National Service with the Bank for the upcoming service year.\n\n" +
-        "**What We Are Looking For:**\n" +
-        "- Be registered and eligible for National Service\n" +
-        "- Hold a minimum of a First Degree from a recognized tertiary institution\n" +
-        "- Demonstrate strong communication and interpersonal skills\n" +
-        "- Possess a proactive attitude, integrity, and a willingness to learn\n" +
-        "- Be proficient in Microsoft Office applications\n" +
-        "- Exhibit excellent analytical and problem-solving abilities\n\n" +
-        "**What You Will Gain:**\n" +
-        "- Hands-on experience in the banking industry\n" +
-        "- Exposure to professional banking operations and practices\n" +
-        "- Mentorship and coaching from experienced professionals\n" +
-        "- Opportunities to develop technical and soft skills\n" +
-        "- A dynamic and collaborative work environment\n\n" +
-        "**Application Deadline:** July 24, 2026. **Minimum Qualification:** First Degree.\n\n" +
-        "**To Apply:** https://forms.gle/sVRsitsL4uVNWBjH7",
+      fullDescription: "Your Future Starts Here. Ready to Begin Your Career Journey with One of Ghana's Leading Indigenous Banks? Universal Merchant Bank Ltd invites applications from qualified and motivated graduates seeking to undertake their National Service with the Bank for the upcoming service year.\n\n**What We Are Looking For:**\n- Be registered and eligible for National Service\n- Hold a minimum of a First Degree from a recognized tertiary institution\n- Demonstrate strong communication and interpersonal skills\n- Possess a proactive attitude, integrity, and a willingness to learn\n- Be proficient in Microsoft Office applications\n- Exhibit excellent analytical and problem-solving abilities\n\n**What You Will Gain:**\n- Hands-on experience in the banking industry\n- Exposure to professional banking operations and practices\n- Mentorship and coaching from experienced professionals\n- Opportunities to develop technical and soft skills\n- A dynamic and collaborative work environment\n\n**Application Deadline:** July 24, 2026. **Minimum Qualification:** First Degree.\n\n**To Apply:** https://forms.gle/sVRsitsL4uVNWBjH7",
       applyLink: "https://forms.gle/sVRsitsL4uVNWBjH7",
       verified: true
     },
@@ -1445,23 +1269,13 @@
       title: "Medical Officer",
       company: "Pelvin Company Limited (Private Employment Agency)",
       location: "Western Region",
+      category: "Healthcare",
+      region: "Western",
       type: "Full-time",
       salary: "Attractive and competitive, with accommodation support",
       posted: "26 Jun 2026",
       description: "Deliver clinical care and support occupational health initiatives for an international organization's on-site healthcare team.",
-      fullDescription:
-        "An international organization is seeking to recruit a qualified and experienced Medical Officer to join its on-site healthcare team in the Western Region. The successful candidate will be responsible for delivering high-quality clinical care, supporting occupational health initiatives, and ensuring effective medical service delivery in line with professional standards.\n\n" +
-        "**Role Overview:** The role involves providing clinical care, overseeing healthcare staff, supporting occupational health and safety activities, and contributing to preventive health programs within a structured organizational environment.\n\n" +
-        "**Key Requirements:**\n" +
-        "- Medical degree (MD or MBChB) from a recognized institution\n" +
-        "- Valid registration with the Ghana Medical and Dental Council and a current practicing license\n" +
-        "- Minimum of two (2) years post-qualification experience\n" +
-        "- Strong competence in general medicine and emergency care\n" +
-        "- Ability to provide clinical leadership and work within a multidisciplinary team\n" +
-        "- Good reporting, communication, and organizational skills\n\n" +
-        "**Remuneration:** Attractive and competitive package, including accommodation support and opportunities for professional development.\n\n" +
-        "**Application Deadline:** June 30, 2026.\n\n" +
-        "**To Apply:** Submit your cover letter, CV, and relevant certificates to recruitment@pelvinghana.com. For more inquiries: 0312324519. Website: www.pelvinghana.com.",
+      fullDescription: "An international organization is seeking to recruit a qualified and experienced Medical Officer to join its on-site healthcare team in the Western Region. The successful candidate will be responsible for delivering high-quality clinical care, supporting occupational health initiatives, and ensuring effective medical service delivery in line with professional standards.\n\n**Role Overview:** The role involves providing clinical care, overseeing healthcare staff, supporting occupational health and safety activities, and contributing to preventive health programs within a structured organizational environment.\n\n**Key Requirements:**\n- Medical degree (MD or MBChB) from a recognized institution\n- Valid registration with the Ghana Medical and Dental Council and a current practicing license\n- Minimum of two (2) years post-qualification experience\n- Strong competence in general medicine and emergency care\n- Ability to provide clinical leadership and work within a multidisciplinary team\n- Good reporting, communication, and organizational skills\n\n**Remuneration:** Attractive and competitive package, including accommodation support and opportunities for professional development.\n\n**Application Deadline:** June 30, 2026.\n\n**To Apply:** Submit your cover letter, CV, and relevant certificates to recruitment@pelvinghana.com. For more inquiries: 0312324519. Website: www.pelvinghana.com.",
       applyLink: "mailto:recruitment@pelvinghana.com",
       verified: true
     },
@@ -1469,41 +1283,55 @@
       title: "Bar Attendant",
       company: "Not stated",
       location: "Tema Community 2",
+      category: "Hospitality & Food Service",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "GHC 900 + accommodation & feeding",
       posted: "26 Jun 2026",
       description: "Female bar attendant needed in Tema Community 2. Preference for those already living in the area.",
-      fullDescription:
-        "Bar attendant needed at Tema Community 2.\n\n" +
-        "**Requirements:**\n" +
-        "- Girl, ages 20 and above\n" +
-        "- Must be good at basic math\n" +
-        "- Must be respectful, have patience, and be obedient\n\n" +
-        "**Pay & Perks:**\n" +
-        "- Base salary: GHC 900\n" +
-        "- Accommodation and feeding provided\n" +
-        "- People living around Tema Community 2 will be highly considered\n\n" +
-        "**To Apply:** Text 0559405311 on WhatsApp if interested. No calls.\n\n" +
-        "Note: this listing has not been independently verified — no company name was given, contact is WhatsApp-text-only with calls explicitly declined, and gender/age/personality traits are specified. Treat with the same caution as the Scam Watch guidance below before sharing any personal details.",
+      fullDescription: "Bar attendant needed at Tema Community 2.\n\n**Requirements:**\n- Girl, ages 20 and above\n- Must be good at basic math\n- Must be respectful, have patience, and be obedient\n\n**Pay & Perks:**\n- Base salary: GHC 900\n- Accommodation and feeding provided\n- People living around Tema Community 2 will be highly considered\n\n**To Apply:** Text 0559405311 on WhatsApp if interested. No calls.\n\nNote: this listing has not been independently verified — no company name was given, contact is WhatsApp-text-only with calls explicitly declined, and gender/age/personality traits are specified. Treat with the same caution as the Scam Watch guidance below before sharing any personal details.",
       applyLink: "#",
       verified: false
     },
     {
-      title: "Project Manager, Marketing Executive & Content Strategist",
+      title: "Project Manager",
       company: "Akwaaba Communications",
       location: "Accra",
+      category: "Admin & Office Support",
+      region: "Greater Accra",
       type: "Full-time, Entry level",
       salary: "Not stated",
       posted: "27 Jun 2026",
       description: "Three entry-level openings at the intersection of communications, trade, and West African industry.",
-      fullDescription:
-        "All three roles are entry-level and based in Accra. We're not looking for the most experienced CV. We're looking for the hungriest mind.\n\n" +
-        "**Open Roles (all Full-time, Entry level, Accra, Ghana):**\n" +
-        "- Project Manager\n" +
-        "- Marketing Executive\n" +
-        "- Content Strategist\n\n" +
-        "Build your career at the intersection of communications, trade, and West African industry.\n\n" +
-        "**To Apply:** Send your CV + Cover Letter to talkto@akwaabacommunications.com. Check the original posting's caption for individual role specifications.",
+      fullDescription: "All three roles are entry-level and based in Accra. We're not looking for the most experienced CV. We're looking for the hungriest mind.\n\n**Open Roles (all Full-time, Entry level, Accra, Ghana):**\n- Project Manager\n- Marketing Executive\n- Content Strategist\n\nBuild your career at the intersection of communications, trade, and West African industry.\n\n**To Apply:** Send your CV + Cover Letter to talkto@akwaabacommunications.com. Check the original posting's caption for individual role specifications.",
+      applyLink: "mailto:talkto@akwaabacommunications.com",
+      verified: true
+    },
+    {
+      title: "Marketing Executive",
+      company: "Akwaaba Communications",
+      location: "Accra",
+      category: "Marketing & Communications",
+      region: "Greater Accra",
+      type: "Full-time, Entry level",
+      salary: "Not stated",
+      posted: "27 Jun 2026",
+      description: "Three entry-level openings at the intersection of communications, trade, and West African industry.",
+      fullDescription: "All three roles are entry-level and based in Accra. We're not looking for the most experienced CV. We're looking for the hungriest mind.\n\n**Open Roles (all Full-time, Entry level, Accra, Ghana):**\n- Project Manager\n- Marketing Executive\n- Content Strategist\n\nBuild your career at the intersection of communications, trade, and West African industry.\n\n**To Apply:** Send your CV + Cover Letter to talkto@akwaabacommunications.com. Check the original posting's caption for individual role specifications.",
+      applyLink: "mailto:talkto@akwaabacommunications.com",
+      verified: true
+    },
+    {
+      title: "Content Strategist",
+      company: "Akwaaba Communications",
+      location: "Accra",
+      category: "Creative & Media",
+      region: "Greater Accra",
+      type: "Full-time, Entry level",
+      salary: "Not stated",
+      posted: "27 Jun 2026",
+      description: "Three entry-level openings at the intersection of communications, trade, and West African industry.",
+      fullDescription: "All three roles are entry-level and based in Accra. We're not looking for the most experienced CV. We're looking for the hungriest mind.\n\n**Open Roles (all Full-time, Entry level, Accra, Ghana):**\n- Project Manager\n- Marketing Executive\n- Content Strategist\n\nBuild your career at the intersection of communications, trade, and West African industry.\n\n**To Apply:** Send your CV + Cover Letter to talkto@akwaabacommunications.com. Check the original posting's caption for individual role specifications.",
       applyLink: "mailto:talkto@akwaabacommunications.com",
       verified: true
     },
@@ -1511,75 +1339,111 @@
       title: "Sales Executive",
       company: "King Millers",
       location: "Not stated",
+      category: "Sales & Business Development",
+      region: "Region not stated",
       type: "Full-time",
       salary: "Not stated",
       posted: "27 Jun 2026",
       description: "Sell FMCG products, manage customer relationships, and lead negotiations to drive business growth. 4 openings, reports to Cluster Head.",
-      fullDescription:
-        "**4 Openings.** Reports To: Cluster Head.\n\n" +
-        "Responsible for selling FMCG products. Identify sales opportunities, manage customer relationships, and lead negotiations to drive business growth.\n\n" +
-        "**Key Responsibilities:**\n" +
-        "- Identify and engage potential customers\n" +
-        "- Promote company products and services\n" +
-        "- Build and maintain strong client relationships\n" +
-        "- Achieve monthly sales targets\n" +
-        "- Prepare sales reports and market feedback\n" +
-        "- Conduct field visits within assigned areas\n\n" +
-        "**Requirements:**\n" +
-        "- Bachelor's Degree or Diploma in business administration, finance, or sales and marketing-related field\n" +
-        "- Strong communication and interpersonal skills\n" +
-        "- At least 2 years of experience\n" +
-        "- Self-driven and target-oriented\n\n" +
-        "**Deadline:** 3rd July 2026.\n\n" +
-        "**To Apply:** Send your CV and academic documents (not exceeding 1.5MB) to recruitment@kingmillers.com.",
+      fullDescription: "**4 Openings.** Reports To: Cluster Head.\n\nResponsible for selling FMCG products. Identify sales opportunities, manage customer relationships, and lead negotiations to drive business growth.\n\n**Key Responsibilities:**\n- Identify and engage potential customers\n- Promote company products and services\n- Build and maintain strong client relationships\n- Achieve monthly sales targets\n- Prepare sales reports and market feedback\n- Conduct field visits within assigned areas\n\n**Requirements:**\n- Bachelor's Degree or Diploma in business administration, finance, or sales and marketing-related field\n- Strong communication and interpersonal skills\n- At least 2 years of experience\n- Self-driven and target-oriented\n\n**Deadline:** 3rd July 2026.\n\n**To Apply:** Send your CV and academic documents (not exceeding 1.5MB) to recruitment@kingmillers.com.",
       applyLink: "mailto:recruitment@kingmillers.com",
       verified: true
     },
     {
-      title: "Senior IT Officer, Senior Estates Officer, Senior Internal Auditor, Assistant HR Officer & Assistant Research/M&E Officer",
+      title: "Senior IT Officer",
       company: "National Council for Curriculum and Assessment (NaCCA)",
       location: "Cantonments, Accra",
+      category: "IT & Software",
+      region: "Greater Accra",
       type: "Full-time, Government",
       salary: "Level 16-19 (Base Grade), per Ghana public service scale",
       posted: "27 Jun 2026",
       description: "Five vacancies at NaCCA, including IT, Estates, Internal Audit, HR, and Research/Monitoring & Evaluation officer roles.",
-      fullDescription:
-        "The National Council for Curriculum and Assessment (NaCCA) is inviting applications from qualified, dynamic, and results-oriented professionals to fill the following vacant positions:\n\n" +
-        "**1. Senior IT Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Manage, maintain, and secure the Council's IT infrastructure, networks, and digital communication channels. Requires a Master's Degree in IT, Computer Science or related field, minimum 4 years' post-qualification experience.\n\n" +
-        "**2. Senior Estates Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Oversee management, maintenance, and safety of all NaCCA properties, assets and physical properties. Requires a Master's Degree in Estate Management, Land Economy, Building Technology or related field, minimum 4 years' post-Bachelor's experience.\n\n" +
-        "**3. Senior Internal Auditor (1 Vacancy)** - Entry Salary Level 19 Step 1. Provide technical and operational leadership for the Council's Internal Audit functions. Requires a Master's Degree in Finance, Accounting, Auditing or related field, minimum 4 years' post-qualification experience, completed National Service.\n\n" +
-        "**4. Assistant Human Resource Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Assist in execution of HR strategies, staff welfare management, and personnel administration. Requires a Bachelor's Degree in Human Resource Management or related field, minimum 1 year post-qualification experience, completed National Service.\n\n" +
-        "**5. Assistant Research, Planning, Monitoring & Evaluation Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Support data collection, policy planning, and tracking of educational programmes and curriculum implementation. Requires a minimum of First Degree in Education or related field, minimum 1 year post-qualification experience.\n\n" +
-        "All roles require passing a competitive selection interview conducted by the Governing Board in consultation with the Public Services Commission.\n\n" +
-        "**How to Apply:** Submit Application Letters stating the specific position applied for, along with a detailed Curriculum Vitae (CV) including names and contact details of two (2) referees, addressed to: The Director-General, National Council for Curriculum and Assessment (NaCCA), PMB.77, Cantonments-Accra.\n\n" +
-        "**Email:** info@nacca.gov.gh. **Website:** www.nacca.gov.gh. **Telephone:** 0302909071 / 0302909862.\n\n" +
-        "**Application Deadline:** Monday, 6th July, 2026. Only shortlisted candidates will be contacted for interviews.",
+      fullDescription: "The National Council for Curriculum and Assessment (NaCCA) is inviting applications from qualified, dynamic, and results-oriented professionals to fill the following vacant positions:\n\n**1. Senior IT Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Manage, maintain, and secure the Council's IT infrastructure, networks, and digital communication channels. Requires a Master's Degree in IT, Computer Science or related field, minimum 4 years' post-qualification experience.\n\n**2. Senior Estates Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Oversee management, maintenance, and safety of all NaCCA properties, assets and physical properties. Requires a Master's Degree in Estate Management, Land Economy, Building Technology or related field, minimum 4 years' post-Bachelor's experience.\n\n**3. Senior Internal Auditor (1 Vacancy)** - Entry Salary Level 19 Step 1. Provide technical and operational leadership for the Council's Internal Audit functions. Requires a Master's Degree in Finance, Accounting, Auditing or related field, minimum 4 years' post-qualification experience, completed National Service.\n\n**4. Assistant Human Resource Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Assist in execution of HR strategies, staff welfare management, and personnel administration. Requires a Bachelor's Degree in Human Resource Management or related field, minimum 1 year post-qualification experience, completed National Service.\n\n**5. Assistant Research, Planning, Monitoring & Evaluation Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Support data collection, policy planning, and tracking of educational programmes and curriculum implementation. Requires a minimum of First Degree in Education or related field, minimum 1 year post-qualification experience.\n\nAll roles require passing a competitive selection interview conducted by the Governing Board in consultation with the Public Services Commission.\n\n**How to Apply:** Submit Application Letters stating the specific position applied for, along with a detailed Curriculum Vitae (CV) including names and contact details of two (2) referees, addressed to: The Director-General, National Council for Curriculum and Assessment (NaCCA), PMB.77, Cantonments-Accra.\n\n**Email:** info@nacca.gov.gh. **Website:** www.nacca.gov.gh. **Telephone:** 0302909071 / 0302909862.\n\n**Application Deadline:** Monday, 6th July, 2026. Only shortlisted candidates will be contacted for interviews.",
       applyLink: "mailto:info@nacca.gov.gh",
       verified: true
     },
     {
-      title: "Site Manager & Project Manager",
+      title: "Senior Estates Officer",
+      company: "National Council for Curriculum and Assessment (NaCCA)",
+      location: "Cantonments, Accra",
+      category: "Trades & Technical",
+      region: "Greater Accra",
+      type: "Full-time, Government",
+      salary: "Level 16-19 (Base Grade), per Ghana public service scale",
+      posted: "27 Jun 2026",
+      description: "Five vacancies at NaCCA, including IT, Estates, Internal Audit, HR, and Research/Monitoring & Evaluation officer roles.",
+      fullDescription: "The National Council for Curriculum and Assessment (NaCCA) is inviting applications from qualified, dynamic, and results-oriented professionals to fill the following vacant positions:\n\n**1. Senior IT Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Manage, maintain, and secure the Council's IT infrastructure, networks, and digital communication channels. Requires a Master's Degree in IT, Computer Science or related field, minimum 4 years' post-qualification experience.\n\n**2. Senior Estates Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Oversee management, maintenance, and safety of all NaCCA properties, assets and physical properties. Requires a Master's Degree in Estate Management, Land Economy, Building Technology or related field, minimum 4 years' post-Bachelor's experience.\n\n**3. Senior Internal Auditor (1 Vacancy)** - Entry Salary Level 19 Step 1. Provide technical and operational leadership for the Council's Internal Audit functions. Requires a Master's Degree in Finance, Accounting, Auditing or related field, minimum 4 years' post-qualification experience, completed National Service.\n\n**4. Assistant Human Resource Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Assist in execution of HR strategies, staff welfare management, and personnel administration. Requires a Bachelor's Degree in Human Resource Management or related field, minimum 1 year post-qualification experience, completed National Service.\n\n**5. Assistant Research, Planning, Monitoring & Evaluation Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Support data collection, policy planning, and tracking of educational programmes and curriculum implementation. Requires a minimum of First Degree in Education or related field, minimum 1 year post-qualification experience.\n\nAll roles require passing a competitive selection interview conducted by the Governing Board in consultation with the Public Services Commission.\n\n**How to Apply:** Submit Application Letters stating the specific position applied for, along with a detailed Curriculum Vitae (CV) including names and contact details of two (2) referees, addressed to: The Director-General, National Council for Curriculum and Assessment (NaCCA), PMB.77, Cantonments-Accra.\n\n**Email:** info@nacca.gov.gh. **Website:** www.nacca.gov.gh. **Telephone:** 0302909071 / 0302909862.\n\n**Application Deadline:** Monday, 6th July, 2026. Only shortlisted candidates will be contacted for interviews.",
+      applyLink: "mailto:info@nacca.gov.gh",
+      verified: true
+    },
+    {
+      title: "Senior Internal Auditor",
+      company: "National Council for Curriculum and Assessment (NaCCA)",
+      location: "Cantonments, Accra",
+      category: "Finance & Accounting",
+      region: "Greater Accra",
+      type: "Full-time, Government",
+      salary: "Level 16-19 (Base Grade), per Ghana public service scale",
+      posted: "27 Jun 2026",
+      description: "Five vacancies at NaCCA, including IT, Estates, Internal Audit, HR, and Research/Monitoring & Evaluation officer roles.",
+      fullDescription: "The National Council for Curriculum and Assessment (NaCCA) is inviting applications from qualified, dynamic, and results-oriented professionals to fill the following vacant positions:\n\n**1. Senior IT Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Manage, maintain, and secure the Council's IT infrastructure, networks, and digital communication channels. Requires a Master's Degree in IT, Computer Science or related field, minimum 4 years' post-qualification experience.\n\n**2. Senior Estates Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Oversee management, maintenance, and safety of all NaCCA properties, assets and physical properties. Requires a Master's Degree in Estate Management, Land Economy, Building Technology or related field, minimum 4 years' post-Bachelor's experience.\n\n**3. Senior Internal Auditor (1 Vacancy)** - Entry Salary Level 19 Step 1. Provide technical and operational leadership for the Council's Internal Audit functions. Requires a Master's Degree in Finance, Accounting, Auditing or related field, minimum 4 years' post-qualification experience, completed National Service.\n\n**4. Assistant Human Resource Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Assist in execution of HR strategies, staff welfare management, and personnel administration. Requires a Bachelor's Degree in Human Resource Management or related field, minimum 1 year post-qualification experience, completed National Service.\n\n**5. Assistant Research, Planning, Monitoring & Evaluation Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Support data collection, policy planning, and tracking of educational programmes and curriculum implementation. Requires a minimum of First Degree in Education or related field, minimum 1 year post-qualification experience.\n\nAll roles require passing a competitive selection interview conducted by the Governing Board in consultation with the Public Services Commission.\n\n**How to Apply:** Submit Application Letters stating the specific position applied for, along with a detailed Curriculum Vitae (CV) including names and contact details of two (2) referees, addressed to: The Director-General, National Council for Curriculum and Assessment (NaCCA), PMB.77, Cantonments-Accra.\n\n**Email:** info@nacca.gov.gh. **Website:** www.nacca.gov.gh. **Telephone:** 0302909071 / 0302909862.\n\n**Application Deadline:** Monday, 6th July, 2026. Only shortlisted candidates will be contacted for interviews.",
+      applyLink: "mailto:info@nacca.gov.gh",
+      verified: true
+    },
+    {
+      title: "Assistant Human Resource Officer",
+      company: "National Council for Curriculum and Assessment (NaCCA)",
+      location: "Cantonments, Accra",
+      category: "HR & Admin",
+      region: "Greater Accra",
+      type: "Full-time, Government",
+      salary: "Level 16-19 (Base Grade), per Ghana public service scale",
+      posted: "27 Jun 2026",
+      description: "Five vacancies at NaCCA, including IT, Estates, Internal Audit, HR, and Research/Monitoring & Evaluation officer roles.",
+      fullDescription: "The National Council for Curriculum and Assessment (NaCCA) is inviting applications from qualified, dynamic, and results-oriented professionals to fill the following vacant positions:\n\n**1. Senior IT Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Manage, maintain, and secure the Council's IT infrastructure, networks, and digital communication channels. Requires a Master's Degree in IT, Computer Science or related field, minimum 4 years' post-qualification experience.\n\n**2. Senior Estates Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Oversee management, maintenance, and safety of all NaCCA properties, assets and physical properties. Requires a Master's Degree in Estate Management, Land Economy, Building Technology or related field, minimum 4 years' post-Bachelor's experience.\n\n**3. Senior Internal Auditor (1 Vacancy)** - Entry Salary Level 19 Step 1. Provide technical and operational leadership for the Council's Internal Audit functions. Requires a Master's Degree in Finance, Accounting, Auditing or related field, minimum 4 years' post-qualification experience, completed National Service.\n\n**4. Assistant Human Resource Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Assist in execution of HR strategies, staff welfare management, and personnel administration. Requires a Bachelor's Degree in Human Resource Management or related field, minimum 1 year post-qualification experience, completed National Service.\n\n**5. Assistant Research, Planning, Monitoring & Evaluation Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Support data collection, policy planning, and tracking of educational programmes and curriculum implementation. Requires a minimum of First Degree in Education or related field, minimum 1 year post-qualification experience.\n\nAll roles require passing a competitive selection interview conducted by the Governing Board in consultation with the Public Services Commission.\n\n**How to Apply:** Submit Application Letters stating the specific position applied for, along with a detailed Curriculum Vitae (CV) including names and contact details of two (2) referees, addressed to: The Director-General, National Council for Curriculum and Assessment (NaCCA), PMB.77, Cantonments-Accra.\n\n**Email:** info@nacca.gov.gh. **Website:** www.nacca.gov.gh. **Telephone:** 0302909071 / 0302909862.\n\n**Application Deadline:** Monday, 6th July, 2026. Only shortlisted candidates will be contacted for interviews.",
+      applyLink: "mailto:info@nacca.gov.gh",
+      verified: true
+    },
+    {
+      title: "Assistant Research, Planning, Monitoring & Evaluation Officer",
+      company: "National Council for Curriculum and Assessment (NaCCA)",
+      location: "Cantonments, Accra",
+      category: "Research & Data",
+      region: "Greater Accra",
+      type: "Full-time, Government",
+      salary: "Level 16-19 (Base Grade), per Ghana public service scale",
+      posted: "27 Jun 2026",
+      description: "Five vacancies at NaCCA, including IT, Estates, Internal Audit, HR, and Research/Monitoring & Evaluation officer roles.",
+      fullDescription: "The National Council for Curriculum and Assessment (NaCCA) is inviting applications from qualified, dynamic, and results-oriented professionals to fill the following vacant positions:\n\n**1. Senior IT Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Manage, maintain, and secure the Council's IT infrastructure, networks, and digital communication channels. Requires a Master's Degree in IT, Computer Science or related field, minimum 4 years' post-qualification experience.\n\n**2. Senior Estates Officer (1 Vacancy)** - Entry Salary Level 19 Step 1. Oversee management, maintenance, and safety of all NaCCA properties, assets and physical properties. Requires a Master's Degree in Estate Management, Land Economy, Building Technology or related field, minimum 4 years' post-Bachelor's experience.\n\n**3. Senior Internal Auditor (1 Vacancy)** - Entry Salary Level 19 Step 1. Provide technical and operational leadership for the Council's Internal Audit functions. Requires a Master's Degree in Finance, Accounting, Auditing or related field, minimum 4 years' post-qualification experience, completed National Service.\n\n**4. Assistant Human Resource Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Assist in execution of HR strategies, staff welfare management, and personnel administration. Requires a Bachelor's Degree in Human Resource Management or related field, minimum 1 year post-qualification experience, completed National Service.\n\n**5. Assistant Research, Planning, Monitoring & Evaluation Officer (1 Vacancy)** - Entry Salary Level 16 Step 1. Support data collection, policy planning, and tracking of educational programmes and curriculum implementation. Requires a minimum of First Degree in Education or related field, minimum 1 year post-qualification experience.\n\nAll roles require passing a competitive selection interview conducted by the Governing Board in consultation with the Public Services Commission.\n\n**How to Apply:** Submit Application Letters stating the specific position applied for, along with a detailed Curriculum Vitae (CV) including names and contact details of two (2) referees, addressed to: The Director-General, National Council for Curriculum and Assessment (NaCCA), PMB.77, Cantonments-Accra.\n\n**Email:** info@nacca.gov.gh. **Website:** www.nacca.gov.gh. **Telephone:** 0302909071 / 0302909862.\n\n**Application Deadline:** Monday, 6th July, 2026. Only shortlisted candidates will be contacted for interviews.",
+      applyLink: "mailto:info@nacca.gov.gh",
+      verified: true
+    },
+    {
+      title: "Site Manager",
       company: "Headquarters Developers Limited",
       location: "Not stated",
+      category: "Trades & Technical",
+      region: "Region not stated",
       type: "Full-time",
       salary: "Not stated",
       posted: "27 Jun 2026",
       description: "Civil engineering leadership roles for a real estate developer — minimum 4 years' experience required for both positions.",
-      fullDescription:
-        "At Headquarters Developers Limited, we go beyond infrastructure - we create lasting impact. We're looking for experienced professionals to join our dynamic team and help us shape the future, together.\n\n" +
-        "**Site Manager - Who We Are Looking For:**\n" +
-        "- Civil Engineering Background\n" +
-        "- Minimum 4 Years of Experience\n" +
-        "- Strong Site Execution & Supervision Skills\n" +
-        "- Ability to Manage Teams & Resources\n" +
-        "- Focused on Quality, Safety & Timely Delivery\n\n" +
-        "**Project Manager - Who We Are Looking For:**\n" +
-        "- Civil Engineering Background\n" +
-        "- Minimum 4 Years of Experience\n" +
-        "- Proven Experience in Project Planning & Management\n" +
-        "- Strong Communication & Leadership Skills\n" +
-        "- Budget, Timeline & Risk Management Expertise\n\n" +
-        "**To Apply:** Send your CV to info@hqdevelopers.com with the position you're applying for in the subject line. Learn more at hqdevelopers.com.",
+      fullDescription: "At Headquarters Developers Limited, we go beyond infrastructure - we create lasting impact. We're looking for experienced professionals to join our dynamic team and help us shape the future, together.\n\n**Site Manager - Who We Are Looking For:**\n- Civil Engineering Background\n- Minimum 4 Years of Experience\n- Strong Site Execution & Supervision Skills\n- Ability to Manage Teams & Resources\n- Focused on Quality, Safety & Timely Delivery\n\n**Project Manager - Who We Are Looking For:**\n- Civil Engineering Background\n- Minimum 4 Years of Experience\n- Proven Experience in Project Planning & Management\n- Strong Communication & Leadership Skills\n- Budget, Timeline & Risk Management Expertise\n\n**To Apply:** Send your CV to info@hqdevelopers.com with the position you're applying for in the subject line. Learn more at hqdevelopers.com.",
+      applyLink: "mailto:info@hqdevelopers.com",
+      verified: true
+    },
+    {
+      title: "Project Manager",
+      company: "Headquarters Developers Limited",
+      location: "Not stated",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "27 Jun 2026",
+      description: "Civil engineering leadership roles for a real estate developer — minimum 4 years' experience required for both positions.",
+      fullDescription: "At Headquarters Developers Limited, we go beyond infrastructure - we create lasting impact. We're looking for experienced professionals to join our dynamic team and help us shape the future, together.\n\n**Site Manager - Who We Are Looking For:**\n- Civil Engineering Background\n- Minimum 4 Years of Experience\n- Strong Site Execution & Supervision Skills\n- Ability to Manage Teams & Resources\n- Focused on Quality, Safety & Timely Delivery\n\n**Project Manager - Who We Are Looking For:**\n- Civil Engineering Background\n- Minimum 4 Years of Experience\n- Proven Experience in Project Planning & Management\n- Strong Communication & Leadership Skills\n- Budget, Timeline & Risk Management Expertise\n\n**To Apply:** Send your CV to info@hqdevelopers.com with the position you're applying for in the subject line. Learn more at hqdevelopers.com.",
       applyLink: "mailto:info@hqdevelopers.com",
       verified: true
     },
@@ -1587,28 +1451,13 @@
       title: "Stores & Parts Officer",
       company: "Iken Auto Tech",
       location: "Kings Avenue, Tema Community 25",
+      category: "Trades & Technical",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "Not stated",
       posted: "27 Jun 2026",
       description: "Manage automotive parts inventory and workshop supplies for a Tema Community 25 auto workshop. Must reside within Tema Community 25 or very close to Kings Avenue.",
-      fullDescription:
-        "**About Us:** Iken Auto Tech is a premier automotive workshop in Tema Community 25 specializing in premium oil services, suspension repairs, smash repair & spraying, and interior upholstery restoration. We pride ourselves on precision, quality, and excellent customer service.\n\n" +
-        "**Job Overview:** We are seeking an organized, detail-oriented, and reliable Stores & Parts Officer to manage our automotive parts inventory and workshop supplies. The successful candidate will ensure that our technicians have the right parts at the right time while maintaining accurate stock records.\n\n" +
-        "**Key Responsibilities:**\n" +
-        "- Inventory Management: Receive, inspect, log, and organize all incoming automotive parts, lubricants, and workshop tools\n" +
-        "- Parts Issuance: Verify technician requests and issue the correct parts for specific vehicle service orders\n" +
-        "- Supplier Coordination: Liaise with approved parts suppliers to place orders and follow up on deliveries\n" +
-        "- Stock Tracking: Maintain accurate, up-to-date digital or manual stock cards; conduct regular physical stock counts to prevent shortages or discrepancies\n" +
-        "- Quality Control: Ensure all received parts match the order specifications and maintain a clean, organized storage environment\n\n" +
-        "**Requirements & Qualifications:**\n" +
-        "- Location: MUST reside within Tema, Community 25, or very close proximity to Kings Avenue (candidates living far from this location will not be considered)\n" +
-        "- Experience: Minimum of 1-2 years of experience in storekeeping, inventory management, or as a parts officer (automotive/mechanic industry experience is a major advantage)\n" +
-        "- Basic knowledge of car parts and mechanical components\n" +
-        "- Strong organizational skills and attention to detail\n" +
-        "- Good numeracy skills for inventory counting and tracking\n" +
-        "- Basic computer literacy (Excel/Word or inventory software)\n" +
-        "- Honest, proactive, and able to work well in a fast-paced workshop environment\n\n" +
-        "**To Apply:** Call or WhatsApp 020 878 7048 or 0545295711 with your CV and a brief cover letter.",
+      fullDescription: "**About Us:** Iken Auto Tech is a premier automotive workshop in Tema Community 25 specializing in premium oil services, suspension repairs, smash repair & spraying, and interior upholstery restoration. We pride ourselves on precision, quality, and excellent customer service.\n\n**Job Overview:** We are seeking an organized, detail-oriented, and reliable Stores & Parts Officer to manage our automotive parts inventory and workshop supplies. The successful candidate will ensure that our technicians have the right parts at the right time while maintaining accurate stock records.\n\n**Key Responsibilities:**\n- Inventory Management: Receive, inspect, log, and organize all incoming automotive parts, lubricants, and workshop tools\n- Parts Issuance: Verify technician requests and issue the correct parts for specific vehicle service orders\n- Supplier Coordination: Liaise with approved parts suppliers to place orders and follow up on deliveries\n- Stock Tracking: Maintain accurate, up-to-date digital or manual stock cards; conduct regular physical stock counts to prevent shortages or discrepancies\n- Quality Control: Ensure all received parts match the order specifications and maintain a clean, organized storage environment\n\n**Requirements & Qualifications:**\n- Location: MUST reside within Tema, Community 25, or very close proximity to Kings Avenue (candidates living far from this location will not be considered)\n- Experience: Minimum of 1-2 years of experience in storekeeping, inventory management, or as a parts officer (automotive/mechanic industry experience is a major advantage)\n- Basic knowledge of car parts and mechanical components\n- Strong organizational skills and attention to detail\n- Good numeracy skills for inventory counting and tracking\n- Basic computer literacy (Excel/Word or inventory software)\n- Honest, proactive, and able to work well in a fast-paced workshop environment\n\n**To Apply:** Call or WhatsApp 020 878 7048 or 0545295711 with your CV and a brief cover letter.",
       applyLink: "tel:0208787048",
       verified: true
     },
@@ -1616,20 +1465,13 @@
       title: "Mobile Money Vendor",
       company: "EZE Way Solution",
       location: "Effiakuma, Takoradi",
+      category: "Finance & Accounting",
+      region: "Western",
       type: "Not stated",
       salary: "To be discussed at interview",
       posted: "27 Jun 2026",
       description: "MoMo vendor role in Effiakuma, Takoradi. Prior mobile money vending experience is an advantage.",
-      fullDescription:
-        "**Position:** Mobile Money Vendor (MoMo).\n" +
-        "**Location:** Effiakuma, Takoradi.\n" +
-        "**Salary:** To be discussed during the interview.\n\n" +
-        "**Requirements:**\n" +
-        "- Previous experience as a Mobile Money Vendor is an advantage\n" +
-        "- Good customer service and communication skills\n" +
-        "- Honest, reliable, and responsible\n" +
-        "- Basic numeracy skills\n\n" +
-        "**To Apply:** Call or WhatsApp 055 807 9425 for more information.",
+      fullDescription: "**Position:** Mobile Money Vendor (MoMo).\n**Location:** Effiakuma, Takoradi.\n**Salary:** To be discussed during the interview.\n\n**Requirements:**\n- Previous experience as a Mobile Money Vendor is an advantage\n- Good customer service and communication skills\n- Honest, reliable, and responsible\n- Basic numeracy skills\n\n**To Apply:** Call or WhatsApp 055 807 9425 for more information.",
       applyLink: "tel:0558079425",
       verified: true
     },
@@ -1637,20 +1479,13 @@
       title: "National Service Personnel - Multiple Departments",
       company: "Ghana Tourism Development Company (GTDC)",
       location: "Head Office Accra, Assin Manso, Oda",
+      category: "Internships & National Service",
+      region: "Greater Accra",
       type: "National Service (2026/2027)",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "GTDC is recruiting National Service personnel for 2026/2027 across Digital Marketing, Graphic Design, PR, Tourism Management, Web Development, Accounting, HR, and more.",
-      fullDescription:
-        "GTDC is recruiting National Service personnel for the 2026/2027 National Service year. Exciting roles across various departments await you. If you have a background or a strong interest in any of the following fields, join us:\n\n" +
-        "**Digital Marketing / Content Creation, Graphic Design and Photo/Video Production, PR/Journalism, SEO Expert** - Head Office, Accra\n\n" +
-        "**Marketing Management, Tourism Management, Tour Guides and French** - Accra (Head Office), Assin Manso, Oda\n\n" +
-        "**Web Development, Information Technology** - Head Office, Accra\n\n" +
-        "**Accounting, Human Resources, Procurement Management** - Head Office Accra, Assin Manso, Oda\n\n" +
-        "**HND Auto Mechanics** - Head Office, Accra\n\n" +
-        "At GTDC, we offer a platform to create, impact and grow in a dynamic environment.\n\n" +
-        "**Deadline for Submission:** 10th July, 2026.\n\n" +
-        "**To Apply:** Submit your hard copy application at the GTDC Head Office, or email hr.admin@gtdc.gov.gh.",
+      fullDescription: "GTDC is recruiting National Service personnel for the 2026/2027 National Service year. Exciting roles across various departments await you. If you have a background or a strong interest in any of the following fields, join us:\n\n**Digital Marketing / Content Creation, Graphic Design and Photo/Video Production, PR/Journalism, SEO Expert** - Head Office, Accra\n\n**Marketing Management, Tourism Management, Tour Guides and French** - Accra (Head Office), Assin Manso, Oda\n\n**Web Development, Information Technology** - Head Office, Accra\n\n**Accounting, Human Resources, Procurement Management** - Head Office Accra, Assin Manso, Oda\n\n**HND Auto Mechanics** - Head Office, Accra\n\nAt GTDC, we offer a platform to create, impact and grow in a dynamic environment.\n\n**Deadline for Submission:** 10th July, 2026.\n\n**To Apply:** Submit your hard copy application at the GTDC Head Office, or email hr.admin@gtdc.gov.gh.",
       applyLink: "mailto:hr.admin@gtdc.gov.gh",
       verified: true
     },
@@ -1658,19 +1493,13 @@
       title: "Delivery Driver",
       company: "Atlantis F&B Corporation Ltd",
       location: "Airport City, Accra",
+      category: "Driving & Transport",
+      region: "Greater Accra",
       type: "Full-time",
       salary: "GHS 2,500",
       posted: "28 Jun 2026",
       description: "Deliver for an F&B company in Airport City, Accra. Minimum 3 years driving experience, familiar with local routes and Google Maps.",
-      fullDescription:
-        "**Requirements:**\n" +
-        "- Have a valid driver's license\n" +
-        "- Minimum of 3 years driving experience\n" +
-        "- Familiar with local routes and Google Maps\n" +
-        "- Punctual, responsible, and polite\n\n" +
-        "**Salary:** GHS 2,500.\n\n" +
-        "**Deadline:** 7th July, 2026.\n\n" +
-        "**To Apply:** Send your CV to info@atlantisfbcorporation.org.",
+      fullDescription: "**Requirements:**\n- Have a valid driver's license\n- Minimum of 3 years driving experience\n- Familiar with local routes and Google Maps\n- Punctual, responsible, and polite\n\n**Salary:** GHS 2,500.\n\n**Deadline:** 7th July, 2026.\n\n**To Apply:** Send your CV to info@atlantisfbcorporation.org.",
       applyLink: "mailto:info@atlantisfbcorporation.org",
       verified: true
     },
@@ -1678,21 +1507,13 @@
       title: "Business Manager",
       company: "ICON",
       location: "Wa & Tamale",
+      category: "Sales & Business Development",
+      region: "Northern / Upper West",
       type: "Full-time",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Oversee a fuel/retail service outlet as a profitable, self-financing business — operations, personnel, marketing, inventory, and financial control.",
-      fullDescription:
-        "**Reporting Line:** Retail Manager.\n\n" +
-        "**Job Purpose:** The core purpose of the role is to oversee the operations of the service outlet as a profitable and self-financing business. This includes managing the outlet in an efficient and profitable manner, supporting with employment and personnel issues, marketing and sales, inventory control, financial management and control.\n\n" +
-        "**Experience and Education:**\n" +
-        "- Bachelor's Degree in Marketing, Business Administration or related field\n" +
-        "- Must have completed National Service\n" +
-        "- Experience at a fuel or general retail service centre will be an advantage\n" +
-        "- Knowledge of inventory management, financial reporting and operational compliance\n" +
-        "- Familiarity with the fuel service industry's health, safety, and environmental standards\n\n" +
-        "**Application Deadline:** 30th June, 2026.\n\n" +
-        "**To Apply:** Send your CV to careers@myiconenergy.com with the subject line \"Business Manager Wa/Tamale\".",
+      fullDescription: "**Reporting Line:** Retail Manager.\n\n**Job Purpose:** The core purpose of the role is to oversee the operations of the service outlet as a profitable and self-financing business. This includes managing the outlet in an efficient and profitable manner, supporting with employment and personnel issues, marketing and sales, inventory control, financial management and control.\n\n**Experience and Education:**\n- Bachelor's Degree in Marketing, Business Administration or related field\n- Must have completed National Service\n- Experience at a fuel or general retail service centre will be an advantage\n- Knowledge of inventory management, financial reporting and operational compliance\n- Familiarity with the fuel service industry's health, safety, and environmental standards\n\n**Application Deadline:** 30th June, 2026.\n\n**To Apply:** Send your CV to careers@myiconenergy.com with the subject line \"Business Manager Wa/Tamale\".",
       applyLink: "mailto:careers@myiconenergy.com",
       verified: true
     },
@@ -1700,19 +1521,13 @@
       title: "Internship Programme - Various Functions",
       company: "CARE International",
       location: "Not stated",
+      category: "Internships & National Service",
+      region: "Region not stated",
       type: "Internship",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Open to students and recent graduates seeking experience in humanitarian and international development work, across various programme and support functions.",
-      fullDescription:
-        "The CARE International Internship Programme is now accepting applications from students and recent graduates.\n\n" +
-        "- Open to students and recent graduates\n" +
-        "- Gain experience in humanitarian and international development work\n" +
-        "- Build professional skills alongside experienced teams\n" +
-        "- Opportunities across various programme and support functions\n" +
-        "- Contribute to meaningful global impact\n\n" +
-        "A great opportunity to launch your career with a leading international humanitarian organization.\n\n" +
-        "**To Apply:** https://lnkd.in/e6ATkZdA",
+      fullDescription: "The CARE International Internship Programme is now accepting applications from students and recent graduates.\n\n- Open to students and recent graduates\n- Gain experience in humanitarian and international development work\n- Build professional skills alongside experienced teams\n- Opportunities across various programme and support functions\n- Contribute to meaningful global impact\n\nA great opportunity to launch your career with a leading international humanitarian organization.\n\n**To Apply:** https://lnkd.in/e6ATkZdA",
       applyLink: "https://lnkd.in/e6ATkZdA",
       verified: true
     },
@@ -1720,18 +1535,13 @@
       title: "Driver",
       company: "DNMG Ghana Limited",
       location: "Spintex or Nungua",
+      category: "Driving & Transport",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Must reside around Spintex or Nungua. Exemplary teamwork and good communication skills required.",
-      fullDescription:
-        "**Requirements:**\n" +
-        "- Exemplary team work\n" +
-        "- Good communication skills\n" +
-        "- Attention to details\n" +
-        "- Must have a valid driver's license\n" +
-        "- Must reside around Spintex or Nungua\n\n" +
-        "**To Apply:** Email your CV to dnmgghanalimited@gmail.com, or send a DM to +233 55 827 6991 or +233 20 752 4273.",
+      fullDescription: "**Requirements:**\n- Exemplary team work\n- Good communication skills\n- Attention to details\n- Must have a valid driver's license\n- Must reside around Spintex or Nungua\n\n**To Apply:** Email your CV to dnmgghanalimited@gmail.com, or send a DM to +233 55 827 6991 or +233 20 752 4273.",
       applyLink: "mailto:dnmgghanalimited@gmail.com",
       verified: true
     },
@@ -1739,38 +1549,83 @@
       title: "Director of Operations",
       company: "African Health Economics And Policy Association (AfHEA)",
       location: "Accra, Ghana",
+      category: "HR & Admin",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Oversee organisational strategy, finance, HR, administration, membership engagement, and sustainability initiatives for a health economics association.",
-      fullDescription:
-        "AfHEA seeks an experienced operations leader to oversee organisational strategy, finance, HR, administration, membership engagement, and sustainability initiatives.\n\n" +
-        "**Requirements:**\n" +
-        "- Master's Degree in a relevant field\n" +
-        "- Minimum 5 years' operations management experience\n" +
-        "- Strong leadership, financial management, and resource mobilisation skills\n\n" +
-        "**Application Deadline:** July 10, 2026. Only shortlisted candidates will be contacted.\n\n" +
-        "**To Apply:** https://afhea.org/director-of-operations/",
+      fullDescription: "AfHEA seeks an experienced operations leader to oversee organisational strategy, finance, HR, administration, membership engagement, and sustainability initiatives.\n\n**Requirements:**\n- Master's Degree in a relevant field\n- Minimum 5 years' operations management experience\n- Strong leadership, financial management, and resource mobilisation skills\n\n**Application Deadline:** July 10, 2026. Only shortlisted candidates will be contacted.\n\n**To Apply:** https://afhea.org/director-of-operations/",
       applyLink: "https://afhea.org/director-of-operations/",
       verified: true
     },
     {
-      title: "Project Manager, Full Stack Developer, UI/UX Designer, Frontend Developer & Backend Developer",
+      title: "Project Manager",
       company: "Lexis Development Company Limited",
       location: "Not stated",
+      category: "IT & Software",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Multiple tech roles for talented, driven individuals to join a team that builds, grows, and leads.",
-      fullDescription:
-        "We are looking for talented and driven individuals to fill the following roles:\n\n" +
-        "- Project Manager\n" +
-        "- Full Stack Developers\n" +
-        "- UI/UX Designer\n" +
-        "- Frontend Developer\n" +
-        "- Backend Developer\n\n" +
-        "Join a team that builds, grows, and leads.\n\n" +
-        "**To Apply:** Send your application to lexisdevelopmentghana@gmail.com.",
+      fullDescription: "We are looking for talented and driven individuals to fill the following roles:\n\n- Project Manager\n- Full Stack Developers\n- UI/UX Designer\n- Frontend Developer\n- Backend Developer\n\nJoin a team that builds, grows, and leads.\n\n**To Apply:** Send your application to lexisdevelopmentghana@gmail.com.",
+      applyLink: "mailto:lexisdevelopmentghana@gmail.com",
+      verified: true
+    },
+    {
+      title: "Full Stack Developer",
+      company: "Lexis Development Company Limited",
+      location: "Not stated",
+      category: "IT & Software",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "28 Jun 2026",
+      description: "Multiple tech roles for talented, driven individuals to join a team that builds, grows, and leads.",
+      fullDescription: "We are looking for talented and driven individuals to fill the following roles:\n\n- Project Manager\n- Full Stack Developers\n- UI/UX Designer\n- Frontend Developer\n- Backend Developer\n\nJoin a team that builds, grows, and leads.\n\n**To Apply:** Send your application to lexisdevelopmentghana@gmail.com.",
+      applyLink: "mailto:lexisdevelopmentghana@gmail.com",
+      verified: true
+    },
+    {
+      title: "UI/UX Designer",
+      company: "Lexis Development Company Limited",
+      location: "Not stated",
+      category: "IT & Software",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "28 Jun 2026",
+      description: "Multiple tech roles for talented, driven individuals to join a team that builds, grows, and leads.",
+      fullDescription: "We are looking for talented and driven individuals to fill the following roles:\n\n- Project Manager\n- Full Stack Developers\n- UI/UX Designer\n- Frontend Developer\n- Backend Developer\n\nJoin a team that builds, grows, and leads.\n\n**To Apply:** Send your application to lexisdevelopmentghana@gmail.com.",
+      applyLink: "mailto:lexisdevelopmentghana@gmail.com",
+      verified: true
+    },
+    {
+      title: "Frontend Developer",
+      company: "Lexis Development Company Limited",
+      location: "Not stated",
+      category: "IT & Software",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "28 Jun 2026",
+      description: "Multiple tech roles for talented, driven individuals to join a team that builds, grows, and leads.",
+      fullDescription: "We are looking for talented and driven individuals to fill the following roles:\n\n- Project Manager\n- Full Stack Developers\n- UI/UX Designer\n- Frontend Developer\n- Backend Developer\n\nJoin a team that builds, grows, and leads.\n\n**To Apply:** Send your application to lexisdevelopmentghana@gmail.com.",
+      applyLink: "mailto:lexisdevelopmentghana@gmail.com",
+      verified: true
+    },
+    {
+      title: "Backend Developer",
+      company: "Lexis Development Company Limited",
+      location: "Not stated",
+      category: "IT & Software",
+      region: "Region not stated",
+      type: "Not stated",
+      salary: "Not stated",
+      posted: "28 Jun 2026",
+      description: "Multiple tech roles for talented, driven individuals to join a team that builds, grows, and leads.",
+      fullDescription: "We are looking for talented and driven individuals to fill the following roles:\n\n- Project Manager\n- Full Stack Developers\n- UI/UX Designer\n- Frontend Developer\n- Backend Developer\n\nJoin a team that builds, grows, and leads.\n\n**To Apply:** Send your application to lexisdevelopmentghana@gmail.com.",
       applyLink: "mailto:lexisdevelopmentghana@gmail.com",
       verified: true
     },
@@ -1778,12 +1633,13 @@
       title: "Driver",
       company: "SIMGroup",
       location: "Not stated",
+      category: "Driving & Transport",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Driver role at SIMGroup (Success, Imagination & Motivation).",
-      fullDescription:
-        "**To Apply:** Send your CV to Support@simgroupltd.com, or contact 0551565708 / 0505623292.",
+      fullDescription: "**To Apply:** Send your CV to Support@simgroupltd.com, or contact 0551565708 / 0505623292.",
       applyLink: "mailto:Support@simgroupltd.com",
       verified: true
     },
@@ -1791,13 +1647,13 @@
       title: "Content & Community Host",
       company: "Colorbox Cosmetics",
       location: "Not stated",
+      category: "Marketing & Communications",
+      region: "Region not stated",
       type: "Not stated",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Colorbox Cosmetics is hiring a Content & Community Host. Apply via Google Form.",
-      fullDescription:
-        "Colorbox Cosmetics is hiring.\n\n" +
-        "**To Apply:** Click the link and fill out the Google Form: https://docs.google.com/forms/d/e/1FAIpQLSd_6qsKyUE-wHI44u6uN-rqzToDwWPv4hOeqsGnKqhWTyNU8A/viewform",
+      fullDescription: "Colorbox Cosmetics is hiring.\n\n**To Apply:** Click the link and fill out the Google Form: https://docs.google.com/forms/d/e/1FAIpQLSd_6qsKyUE-wHI44u6uN-rqzToDwWPv4hOeqsGnKqhWTyNU8A/viewform",
       applyLink: "https://docs.google.com/forms/d/e/1FAIpQLSd_6qsKyUE-wHI44u6uN-rqzToDwWPv4hOeqsGnKqhWTyNU8A/viewform",
       verified: true
     },
@@ -1805,27 +1661,13 @@
       title: "Production Staff",
       company: "Halle-P GH Ltd",
       location: "Tema Community 25, Savannah",
+      category: "Manufacturing & Production",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "Not stated",
       posted: "28 Jun 2026",
       description: "Join the team at Halle-P Industries Ltd, manufacturers of St. Ann's Sugar and other quality food products.",
-      fullDescription:
-        "Join our growing team at Halle-P Industries Ltd, manufacturers of St. Ann's Sugar and other quality food products.\n\n" +
-        "**Requirements:**\n" +
-        "- JHS/SHS Certificate\n" +
-        "- Physically fit\n" +
-        "- Honest\n" +
-        "- Responsible\n" +
-        "- Good personal hygiene\n" +
-        "- Ability to follow instructions\n" +
-        "- Must be punctual\n\n" +
-        "**Job Responsibilities:**\n" +
-        "- Product packaging and labeling\n" +
-        "- Cleaning/maintaining work areas\n" +
-        "- Assisting production\n" +
-        "- Following food safety standards\n" +
-        "- Supporting warehouse operations\n\n" +
-        "**To Apply:** Email hallepgh@gmail.com or WhatsApp 0509510851.",
+      fullDescription: "Join our growing team at Halle-P Industries Ltd, manufacturers of St. Ann's Sugar and other quality food products.\n\n**Requirements:**\n- JHS/SHS Certificate\n- Physically fit\n- Honest\n- Responsible\n- Good personal hygiene\n- Ability to follow instructions\n- Must be punctual\n\n**Job Responsibilities:**\n- Product packaging and labeling\n- Cleaning/maintaining work areas\n- Assisting production\n- Following food safety standards\n- Supporting warehouse operations\n\n**To Apply:** Email hallepgh@gmail.com or WhatsApp 0509510851.",
       applyLink: "mailto:hallepgh@gmail.com",
       verified: true
     },
@@ -1833,18 +1675,13 @@
       title: "Stock Clerk (Spare Parts)",
       company: "Not stated",
       location: "Achimota",
+      category: "Trades & Technical",
+      region: "Greater Accra",
       type: "Not stated",
       salary: "Competitive and attractive",
       posted: "28 Jun 2026",
       description: "Manage spare parts stock for an automotive operation in Achimota. HND in Mechanical Engineering (automotive) required.",
-      fullDescription:
-        "**Position:** Stock Clerk (spare parts).\n" +
-        "**Work Experience:** 2 years' relevant experience in spare parts stock management.\n" +
-        "**Minimum Qualification:** HND in Mechanical Engineering (automotive) or equivalent qualification.\n" +
-        "**Job Location:** Achimota.\n" +
-        "**Application Deadline:** 15th July, 2026.\n\n" +
-        "**To Apply:** Send your CV via WhatsApp to 0257901570.\n\n" +
-        "Note: this listing has not been independently verified - no company name was given, and contact is WhatsApp-only. Worth confirming who you're actually dealing with before sharing personal documents.",
+      fullDescription: "**Position:** Stock Clerk (spare parts).\n**Work Experience:** 2 years' relevant experience in spare parts stock management.\n**Minimum Qualification:** HND in Mechanical Engineering (automotive) or equivalent qualification.\n**Job Location:** Achimota.\n**Application Deadline:** 15th July, 2026.\n\n**To Apply:** Send your CV via WhatsApp to 0257901570.\n\nNote: this listing has not been independently verified - no company name was given, and contact is WhatsApp-only. Worth confirming who you're actually dealing with before sharing personal documents.",
       applyLink: "#",
       verified: false
     },
@@ -1852,6 +1689,8 @@
       title: "",
       company: "",
       location: "",
+      category: "",
+      region: "",
       type: "",
       salary: "",
       posted: "",
@@ -1898,10 +1737,14 @@
   // How many job cards show per page.
   var PAGE_SIZE = 5;
   var currentPage = 1;
+  var activeCategory = 'All';
+  var activeRegion = 'All';
 
   // ---- Render jobs ----
   var jobListEl = document.getElementById('jobList');
   var paginationEl = document.getElementById('pagination');
+  var categoryFilterEl = document.getElementById('categoryFilter');
+  var regionFilterEl = document.getElementById('regionFilter');
 
   // Only real, filled-in jobs are considered for display/counts.
   var realJobs = [];
@@ -1919,6 +1762,52 @@
     if (realJobs[ci].verified) verifiedCount++;
   }
   var filledCount = realJobs.length;
+
+  // Builds the category/region filter button rows. "All" always comes
+  // first; the rest are pulled from whatever actually appears in the
+  // jobs array, so adding a brand-new category/region later just works
+  // without touching this function again.
+  function buildFilterOptions(field) {
+    var seen = { 'All': true };
+    var options = ['All'];
+    for (var i = 0; i < realJobs.length; i++) {
+      var val = realJobs[i][field];
+      if (val && !seen[val]) {
+        seen[val] = true;
+        options.push(val);
+      }
+    }
+    return options;
+  }
+
+  function renderFilterBar(containerEl, field, options, activeValue) {
+    var html = '';
+    for (var i = 0; i < options.length; i++) {
+      var opt = options[i];
+      var isActive = opt === activeValue;
+      html += '<button class="filter-chip' + (isActive ? ' is-active' : '') + '" onclick="setFilter(\'' + field + '\', \'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>';
+    }
+    containerEl.innerHTML = html;
+  }
+
+  // Switches the active category or region filter, resets to page 1
+  // (since the result set just changed), and re-renders everything.
+  function setFilter(field, value) {
+    if (field === 'category') activeCategory = value;
+    if (field === 'region') activeRegion = value;
+    renderFilterBar(categoryFilterEl, 'category', buildFilterOptions('category'), activeCategory);
+    renderFilterBar(regionFilterEl, 'region', buildFilterOptions('region'), activeRegion);
+    renderPage(1);
+  }
+
+  // Returns the jobs matching the currently active category + region.
+  function getFilteredJobs() {
+    return realJobs.filter(function(job) {
+      var categoryMatch = activeCategory === 'All' || job.category === activeCategory;
+      var regionMatch = activeRegion === 'All' || job.region === activeRegion;
+      return categoryMatch && regionMatch;
+    });
+  }
 
   function renderJobCard(job, indexKey) {
     var badge = job.verified ? '<span class="verified-badge">Verified by us</span>' : '';
@@ -1965,17 +1854,18 @@
   }
 
   function renderPage(page) {
-    var totalPages = Math.max(1, Math.ceil(filledCount / PAGE_SIZE));
+    var filtered = getFilteredJobs();
+    var totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
     currentPage = Math.min(Math.max(1, page), totalPages);
 
-    if (filledCount === 0) {
-      jobListEl.innerHTML = '<div class="empty-state">No listings right now — check back soon, or message iDesign Services on WhatsApp to ask what\'s coming up.</div>';
+    if (filtered.length === 0) {
+      jobListEl.innerHTML = '<div class="empty-state">No listings match this filter right now — try "All", or message iDesign Services on WhatsApp to ask what\'s coming up.</div>';
       paginationEl.innerHTML = '';
       return;
     }
 
     var start = (currentPage - 1) * PAGE_SIZE;
-    var pageJobs = realJobs.slice(start, start + PAGE_SIZE);
+    var pageJobs = filtered.slice(start, start + PAGE_SIZE);
 
     var jobHtml = '';
     for (var i = 0; i < pageJobs.length; i++) {
@@ -2008,9 +1898,10 @@
     if (card) card.classList.toggle('is-open');
   }
 
+  // Build the filter bars first, then render page 1 with no filter active.
+  renderFilterBar(categoryFilterEl, 'category', buildFilterOptions('category'), activeCategory);
+  renderFilterBar(regionFilterEl, 'region', buildFilterOptions('region'), activeRegion);
   renderPage(1);
-
-  // ---- Render hero stats ----
   document.getElementById('heroStats').innerHTML =
     '<div><div class="stat-num">' + filledCount + '</div><div class="stat-label">Open Listings</div></div>' +
     '<div><div class="stat-num">' + verifiedCount + '</div><div class="stat-label">Personally Checked</div></div>';
