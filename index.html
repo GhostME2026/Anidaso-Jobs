@@ -2267,7 +2267,7 @@
     // Share button: uses the native share sheet on phones that support
     // it (navigator.share), falls back to opening a WhatsApp share with
     // the job summary on browsers that don't.
-    var shareText = encodeURIComponent(job.title + ' at ' + job.company + ' — ' + job.location + '. Found on Anidaso Jobs: https://anidasojobs.vercel.app');
+    var shareText = encodeURIComponent(job.title + ' at ' + job.company + ' — ' + job.location + '. Found on Anidaso Jobs: https://anidaso-jobs.vercel.app');
     var shareOnClick = 'event.stopPropagation(); shareJob(' + JSON.stringify(job.title) + ', ' + JSON.stringify(job.company) + ', ' + JSON.stringify(job.location) + ')';
     var shareBtn = '<button class="btn btn-share" onclick="' + shareOnClick.replace(/"/g, '&quot;') + '">Share</button>';
 
@@ -2306,7 +2306,7 @@
   // the same summary pre-filled as a fallback.
   function shareJob(title, company, location) {
     var text = title + ' at ' + company + ' — ' + location + '. Found on Anidaso Jobs.';
-    var url = 'https://anidasojobs.vercel.app';
+    var url = 'https://anidaso-jobs.vercel.app';
     if (navigator.share) {
       navigator.share({ title: title, text: text, url: url }).catch(function() {
         // user cancelled the share sheet — nothing to do
