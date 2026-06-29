@@ -340,6 +340,68 @@
     border-radius:14px;
   }
 
+  /* ---------- SEARCH & SAVED ---------- */
+  .search-row{
+    display:flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    flex-wrap: wrap;
+  }
+  .search-input{
+    flex: 1;
+    min-width: 180px;
+    background: var(--white);
+    border: 1.2px solid var(--paper-line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'Inter', sans-serif;
+    font-size: 0.88rem;
+    color: var(--ink);
+  }
+  .search-input:focus{ outline: 2px solid var(--green); outline-offset: 1px; }
+  .saved-toggle{
+    background: var(--white);
+    border: 1.2px solid var(--paper-line);
+    border-radius: 10px;
+    padding: 10px 14px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.78rem;
+    color: var(--ink-soft);
+    cursor: pointer;
+    white-space: nowrap;
+  }
+  .saved-toggle:hover{ border-color: var(--gold); color: var(--clay); }
+  .saved-toggle.is-active{
+    background: var(--gold);
+    border-color: var(--gold);
+    color: var(--ink);
+  }
+
+  .filter-chip .chip-count{
+    opacity: 0.65;
+    font-size: 0.92em;
+    margin-left: 2px;
+  }
+
+  /* Bookmark (save) star button sitting next to the verified badge */
+  .save-star{
+    background: transparent;
+    border: none;
+    font-size: 1.25rem;
+    line-height: 1;
+    cursor: pointer;
+    color: var(--paper-line);
+    padding: 0;
+    margin-left: 8px;
+  }
+  .save-star.is-saved{ color: var(--gold); }
+
+  /* Share button — sits alongside the other job-action buttons, uses the
+     ghost style so it doesn't visually compete with Apply/WhatsApp/CV-help */
+  .btn-share{ background: transparent; color: var(--ink-soft); border: 1.2px solid var(--paper-line); }
+  .btn-share:hover{ border-color: var(--green); color: var(--green); }
+
+
   /* ---------- FILTERS ---------- */
   .filter-group{ margin-bottom: 14px; }
   .filter-label{
@@ -469,6 +531,10 @@
 
     <section id="jobs">
       <div class="divider"><span class="eyebrow">Open Listings</span><span class="line"></span></div>
+      <div class="search-row">
+        <input type="text" id="searchInput" class="search-input" placeholder="Search by job title, company, or location…" oninput="setSearch(this.value)">
+        <button class="saved-toggle" id="savedToggle" onclick="toggleSavedView()">★ Saved (<span id="savedCount">0</span>)</button>
+      </div>
       <div class="filter-group">
         <div class="filter-label">Category</div>
         <div class="filter-bar" id="categoryFilter"><!-- category chips injected by script --></div>
@@ -2019,6 +2085,58 @@
   var currentPage = 1;
   var activeCategory = 'All';
   var activeRegion = 'All';
+  var searchQuery = '';
+  var showingSavedOnly = false;
+
+  // ---- Saved jobs (stored in this browser only, no account needed) ----
+  var SAVED_KEY = 'anidaso_saved_jobs';
+  function getSavedIds() {
+    try {
+      var raw = window.localStorage.getItem(SAVED_KEY);
+      return raw ? JSON.parse(raw) : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  function setSavedIds(ids) {
+    try {
+      window.localStorage.setItem(SAVED_KEY, JSON.stringify(ids));
+    } catch (e) {
+      // localStorage unavailable (private browsing, etc.) — saving
+      // just silently won't persist between visits, page still works.
+    }
+  }
+  // A stable ID for a job that doesn't depend on its position in the
+  // array (which can shift as new jobs get added above it).
+  function jobUid(job) {
+    return job.company + '|' + job.title + '|' + job.posted;
+  }
+  function isSaved(job) {
+    return getSavedIds().indexOf(jobUid(job)) !== -1;
+  }
+  function toggleSaved(uid) {
+    var ids = getSavedIds();
+    var idx = ids.indexOf(uid);
+    if (idx === -1) { ids.push(uid); } else { ids.splice(idx, 1); }
+    setSavedIds(ids);
+    updateSavedCount();
+    renderPage(currentPage);
+  }
+  function updateSavedCount() {
+    var el = document.getElementById('savedCount');
+    if (el) el.textContent = getSavedIds().length;
+  }
+  function toggleSavedView() {
+    showingSavedOnly = !showingSavedOnly;
+    document.getElementById('savedToggle').classList.toggle('is-active', showingSavedOnly);
+    renderPage(1);
+  }
+
+  // ---- Search ----
+  function setSearch(value) {
+    searchQuery = value.trim().toLowerCase();
+    renderPage(1);
+  }
 
   // ---- Render jobs ----
   var jobListEl = document.getElementById('jobList');
@@ -2043,10 +2161,9 @@
   }
   var filledCount = realJobs.length;
 
-  // Builds the category/region filter button rows. "All" always comes
-  // first; the rest are pulled from whatever actually appears in the
-  // jobs array, so adding a brand-new category/region later just works
-  // without touching this function again.
+  // Builds the category/region filter button rows, with a count of how
+  // many jobs match each option GIVEN the other active filters (so the
+  // numbers stay honest as you narrow down, not just raw totals).
   function buildFilterOptions(field) {
     var seen = { 'All': true };
     var options = ['All'];
@@ -2060,12 +2177,28 @@
     return options;
   }
 
+  // Counts how many jobs would match if this option were selected for
+  // `field`, while keeping the OTHER filters (and search) as they are.
+  function countForOption(field, value) {
+    return realJobs.filter(function(job) {
+      var categoryMatch = field === 'category'
+        ? (value === 'All' || job.category === value)
+        : (activeCategory === 'All' || job.category === activeCategory);
+      var regionMatch = field === 'region'
+        ? (value === 'All' || job.region === value)
+        : (activeRegion === 'All' || job.region === activeRegion);
+      var searchMatch = matchesSearch(job);
+      return categoryMatch && regionMatch && searchMatch;
+    }).length;
+  }
+
   function renderFilterBar(containerEl, field, options, activeValue) {
     var html = '';
     for (var i = 0; i < options.length; i++) {
       var opt = options[i];
       var isActive = opt === activeValue;
-      html += '<button class="filter-chip' + (isActive ? ' is-active' : '') + '" onclick="setFilter(\'' + field + '\', \'' + opt.replace(/'/g, "\\'") + '\')">' + opt + '</button>';
+      var count = countForOption(field, opt);
+      html += '<button class="filter-chip' + (isActive ? ' is-active' : '') + '" onclick="setFilter(\'' + field + '\', \'' + opt.replace(/'/g, "\\'") + '\')">' + opt + ' <span class="chip-count">(' + count + ')</span></button>';
     }
     containerEl.innerHTML = html;
   }
@@ -2080,12 +2213,23 @@
     renderPage(1);
   }
 
-  // Returns the jobs matching the currently active category + region.
+  // True if a job's title, company, or location contains the current
+  // search text (case-insensitive). Empty search always matches.
+  function matchesSearch(job) {
+    if (!searchQuery) return true;
+    var haystack = (job.title + ' ' + job.company + ' ' + job.location).toLowerCase();
+    return haystack.indexOf(searchQuery) !== -1;
+  }
+
+  // Returns the jobs matching the currently active category + region +
+  // search text + saved-only toggle, all combined.
   function getFilteredJobs() {
     return realJobs.filter(function(job) {
       var categoryMatch = activeCategory === 'All' || job.category === activeCategory;
       var regionMatch = activeRegion === 'All' || job.region === activeRegion;
-      return categoryMatch && regionMatch;
+      var searchMatch = matchesSearch(job);
+      var savedMatch = !showingSavedOnly || isSaved(job);
+      return categoryMatch && regionMatch && searchMatch && savedMatch;
     });
   }
 
@@ -2096,6 +2240,8 @@
     var hint = hasFull ? '<div class="expand-hint">Tap title or Apply for full details ↓</div>' : '';
     var fullBlock = hasFull ? '<div class="job-full">' + renderBold(job.fullDescription) + '</div>' : '';
     var cardId = 'job-card-' + indexKey;
+    var uid = jobUid(job);
+    var saved = isSaved(job);
 
     // If there's a full description, BOTH the title and the Apply button
     // open the card first — a visitor should see everything before being
@@ -2118,6 +2264,15 @@
       whatsappBtn = '<a class="btn btn-whatsapp" href="https://wa.me/' + job.whatsappApply + '?text=' + employerWaText + '" target="_blank" rel="noopener" onclick="event.stopPropagation()">Apply via WhatsApp</a>';
     }
 
+    // Share button: uses the native share sheet on phones that support
+    // it (navigator.share), falls back to opening a WhatsApp share with
+    // the job summary on browsers that don't.
+    var shareText = encodeURIComponent(job.title + ' at ' + job.company + ' — ' + job.location + '. Found on Anidaso Jobs: https://anidasojobs.vercel.app');
+    var shareOnClick = 'event.stopPropagation(); shareJob(' + JSON.stringify(job.title) + ', ' + JSON.stringify(job.company) + ', ' + JSON.stringify(job.location) + ')';
+    var shareBtn = '<button class="btn btn-share" onclick="' + shareOnClick.replace(/"/g, '&quot;') + '">Share</button>';
+
+    var saveStar = '<button class="save-star' + (saved ? ' is-saved' : '') + '" onclick="event.stopPropagation(); toggleSaved(' + JSON.stringify(uid) + ')" aria-label="Save this job" title="Save this job">' + (saved ? '★' : '☆') + '</button>';
+
     return (
       '<div class="job-card" id="' + cardId + '"' + (hasFull ? ' onclick="toggleJobCard(\'' + cardId + '\')"' : '') + '>' +
         '<div class="job-top">' +
@@ -2126,7 +2281,7 @@
             '<div class="job-company">' + job.company + '</div>' +
             hint +
           '</div>' +
-          badge +
+          '<div>' + badge + saveStar + '</div>' +
         '</div>' +
         '<div class="job-meta">' +
           '<span class="job-location">📍 ' + job.location + '</span>' +
@@ -2140,9 +2295,25 @@
           '<a class="btn btn-primary" href="' + job.applyLink + '" target="_blank" rel="noopener" ' + applyOnClick + '>Apply →</a>' +
           whatsappBtn +
           '<a class="btn btn-ghost" href="https://wa.me/233208916616?text=' + waText + '" target="_blank" rel="noopener">Need help with CV</a>' +
+          shareBtn +
         '</div>' +
       '</div>'
     );
+  }
+
+  // Shares a job either through the device's native share sheet (most
+  // phones) or, if that's not available, opens a WhatsApp message with
+  // the same summary pre-filled as a fallback.
+  function shareJob(title, company, location) {
+    var text = title + ' at ' + company + ' — ' + location + '. Found on Anidaso Jobs.';
+    var url = 'https://anidasojobs.vercel.app';
+    if (navigator.share) {
+      navigator.share({ title: title, text: text, url: url }).catch(function() {
+        // user cancelled the share sheet — nothing to do
+      });
+    } else {
+      window.open('https://wa.me/?text=' + encodeURIComponent(text + ' ' + url), '_blank');
+    }
   }
 
   function renderPage(page) {
@@ -2151,7 +2322,10 @@
     currentPage = Math.min(Math.max(1, page), totalPages);
 
     if (filtered.length === 0) {
-      jobListEl.innerHTML = '<div class="empty-state">No listings match this filter right now — try "All", or message iDesign Services on WhatsApp to ask what\'s coming up.</div>';
+      var emptyMsg = showingSavedOnly
+        ? 'You haven\'t saved any jobs yet — tap the ☆ on a listing to save it here.'
+        : 'No listings match this filter right now — try "All", or message iDesign Services on WhatsApp to ask what\'s coming up.';
+      jobListEl.innerHTML = '<div class="empty-state">' + emptyMsg + '</div>';
       paginationEl.innerHTML = '';
       return;
     }
@@ -2194,6 +2368,7 @@
   renderFilterBar(categoryFilterEl, 'category', buildFilterOptions('category'), activeCategory);
   renderFilterBar(regionFilterEl, 'region', buildFilterOptions('region'), activeRegion);
   renderPage(1);
+  updateSavedCount();
   document.getElementById('heroStats').innerHTML =
     '<div><div class="stat-num">' + filledCount + '</div><div class="stat-label">Open Listings</div></div>' +
     '<div><div class="stat-num">' + verifiedCount + '</div><div class="stat-label">Personally Checked</div></div>';
