@@ -232,6 +232,31 @@
   }
   .verified-badge::before{ content:"✓"; font-weight:700; }
 
+  /* Deadline-passed badge — same shape as verified-badge, warning colors */
+  .expired-badge{
+    display:inline-flex;
+    align-items:center;
+    gap:4px;
+    font-family:'JetBrains Mono', monospace;
+    font-size:0.62rem;
+    text-transform:uppercase;
+    letter-spacing:0.05em;
+    color:var(--warn);
+    background: var(--warn-soft);
+    padding:4px 9px;
+    border-radius:20px;
+    white-space:nowrap;
+    flex-shrink:0;
+    margin-left:6px;
+  }
+  .expired-badge::before{ content:"⏱"; }
+
+  /* Whole card dims slightly once its deadline has passed, so live
+     listings visually stand out first without hiding older ones
+     entirely (some employers keep accepting late applications). */
+  .job-card.job-expired{ opacity:0.68; }
+  .job-card.job-expired:hover{ opacity:0.85; }
+
   .job-meta{
     display:flex;
     flex-wrap:wrap;
@@ -636,6 +661,16 @@
                      field is filled in.
        verified    - true / false — only mark true once YOU have
                      personally checked the source is real
+       deadline    - OPTIONAL. The application closing date, in the SAME
+                     format as "posted", e.g. "22 Jul 2026". Leave as ""
+                     if the posting says "rolling", "until occupied", or
+                     gives no closing date. Once this date has passed,
+                     the site automatically shows a "Deadline passed"
+                     badge on the card, dims it slightly, and sorts it
+                     below still-open listings — no manual cleanup
+                     needed. Still keep the deadline mentioned in
+                     fullDescription's text too; this field just powers
+                     the automatic badge/sort.
 
      A NOTE ON POSTINGS WITH SEVERAL DIFFERENT ROLES:
      If one flyer/post lists several genuinely different jobs (e.g. a
@@ -2635,45 +2670,6 @@
       verified: true
     },
     {
-      title: "Plant & Infrastructure Engineer",
-      company: "Global Talent Masters (GTM), for a manufacturing client",
-      location: "Tema",
-      category: "Trades & Technical",
-      region: "Greater Accra",
-      type: "Full-time",
-      salary: "GHC 15,000 - 25,000 + health insurance + annual bonus",
-      posted: "2 Jul 2026",
-      description: "The Plant & Infrastructure Engineer manages the total lifecycle, reliability, and optimization of manufacturing equipment, physical buildings, surrounding land, and heavy utility systems. This role ensures infrastructure resilience against local environmental challenges while keeping continuous corrugated production highly efficient and legally compliant.",
-      fullDescription: 
-      "**Responsibilities:**\n" +
-        "- Oversee surronding land, concrete marshalling yards, heavy-vehicle loading bays, perimeter security fencing, and access gates to handle highfrequency logistics traffic.\n" +
-        "- Manage industrial stormwater drainage networks and retention pits, ensuring they are clear and fully operational to withstand Tea,e's seasonal heavy downpours.\n" +
-        "- Implement proactive building maintenance and structural coating programs to protect steelwork and roofing assemblies from accelerated coastal humidity and industrial atmospheric corrosion.\n" +
-        "- Manage high-pressure steam boilers, water softwning plants, and condensate return lines essential for paper conditioning. Monitor feedwater quality strictly to prevent scale buildup from local water supplies.\n" +
-        "- Lead the preventive, predictive, and corrective maintenance for high-speed corrugators, flexo-gluers, die-cutters,  and materials handling conveyors.\n" +
-        "- Leverage a Computerized Maintenance Management System to optimize spare parts inventory, balancing local stock levels against international equipment lead times.\n" +
-        "- Oversee the plant's high-voltage electrical distribution, transformers, and switchgear. Manage high-capacity backup generator systems and powerconditioning equipment to mitigate local grid fluctuations and ensure uninterrupted production.\n" +
-        "- Maintain high-capacity compressed air systems and industrial water storage/distribution networks to buffer against municipal supply interruptions.\n" +
-        "- Manage the starch-kitchen wastewater treatment system and factory effluent discharge, ensuring total compliance with environmental discharge parameters.\n\n" +
-
-        "**Qualification & Skills:**\n" +
-        "- Degree in Mechnical, Civil, Electrical, or Industrial Engineering.\n" +
-        "- Membership with the Ghana Institution of Engineering (GhIE) is highly preferred.\n" +
-        "- 5+ years of engineering experience in a heavy continuous-manufacturing plant, with at least 2 years explicitly managing heavy utilities and facility infrastructure.\n" +
-        "- Direct experience in corrugated packaging, paper milling, or FMCG manufacturing is highly.\n" +
-        "- Proven leadership, negotiation, and stakeholder management skills\n\n" +
-
-        "**What we Offer:**\n" +
-        "- A monthly salary range of GHS 15,000 - 25,000 based on qualifications and experience.\n" +
-        "- Health Insurance for self and three (3) dependents.\n" +
-        "- Annual performance bonus.\n\n" +
-        "**Deadline:** 17th July, 2026. \n\n" +
-        "**To Apply:** Interested candidates are invited to send their CV to ransford@globaltalentmasters.com or info@globaltalentmasters.com",
-      applyLink: "mailto:ransford@globaltalentmasters.com",
-      whatsappApply: "233244218566",
-      verified: true
-    },
-    {
       title: "Office Assistant (Male)",
       company: "Not Stated",
       location: "East Legon, Adjiringanor",
@@ -2859,6 +2855,599 @@
       verified: true
     },
     {
+      title: "Sales Person",
+      company: "Pops Theory",
+      location: "Manet, Spintex, Accra",
+      category: "Sales & Business Development",
+      region: "Greater Accra",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "Pops Theory is hiring a Sales Person to work close to Manet, Spintex. Call or text for a short interview.",
+      fullDescription:
+        "**Role:** Sales Person\n\n" +
+        "**Location requirement:** Must be close to Manet, Spintex.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Call or text 0270063766 for a short interview.",
+      applyLink: "tel:+233270063766",
+      whatsappApply: "",
+      verified: true
+    },
+    {
+      title: "Herbal Health Nurse",
+      company: "Reputable Company",
+      location: "Adenta Barrier, near Medi-Moses Clinic, Accra",
+      category: "Healthcare",
+      region: "Greater Accra",
+      type: "Part-time (3 days/week, up to 4 when necessary)",
+      salary: "GHC 1,000/month basic + commission on product sales",
+      posted: "5 Jul 2026",
+      description: "A herbal health and wellness clinic near Adenta Barrier is hiring a Herbal Health Nurse to educate clients and support natural healing services.",
+      fullDescription:
+        "**Key Responsibilities:**\n" +
+        "- Educate clients on the proper use of herbal products.\n" +
+        "- Maintain accurate client records and follow up on progress.\n" +
+        "- Promote and sell herbal products and other wellness items.\n" +
+        "- Ensure a clean, organized, and welcoming environment.\n\n" +
+        "**Requirements:**\n" +
+        "- Strong knowledge of herbal medicine, natural remedies, and wellness practices.\n" +
+        "- Good communication and interpersonal skills.\n" +
+        "- Honest, trustworthy, and customer-friendly.\n" +
+        "- Passionate about natural health and helping others.\n" +
+        "- Previous experience is an added advantage.\n\n" +
+        "**What We Offer:**\n" +
+        "- Basic salary of GHC 1,000/month plus commission on product sales.\n" +
+        "- 3 days per week, with the possibility of 4 when necessary.\n" +
+        "- Supportive and positive work environment.\n" +
+        "- Opportunity to grow in the herbal health and wellness industry.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Call 0556610995.",
+      applyLink: "tel:+233556610995",
+      whatsappApply: "",
+      verified: false
+    },
+    {
+      title: "Administrative & HR Assistant",
+      company: "Cyberteq",
+      location: "Accra",
+      category: "HR & Admin",
+      region: "Greater Accra",
+      type: "Fixed-term reliever, 3-6 months",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "Cyberteq is hiring an Administrative & HR Assistant in Accra on a fixed-term reliever contract of 3 to 6 months.",
+      fullDescription:
+        "**Employment Type:** Fixed-Term Reliever Position\n" +
+        "**Contract Duration:** 3 to 6 months\n\n" +
+        "**To Apply:** Send your application to info.ghana@cyberteq.com",
+      applyLink: "mailto:info.ghana@cyberteq.com",
+      whatsappApply: "",
+      verified: true
+    },
+    {
+      title: "Site Engineer",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Site Engineer role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n" +
+        "- For technical and supervisory positions, candidates must have relevant qualifications and proven site experience.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Site Supervisor",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Site Supervisor role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n" +
+        "- For technical and supervisory positions, candidates must have relevant qualifications and proven site experience.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Foreman",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Foreman role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Storekeeper",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Logistics & Supply Chain",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Storekeeper role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Quantity Surveyor / Assistant QS",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Quantity Surveyor / Assistant QS role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n" +
+        "- For technical and supervisory positions, candidates must have relevant qualifications and proven site experience.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Safety Officer",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Safety Officer role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Mason",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Mason role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Steel Fixer",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Steel Fixer role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Carpenter",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Carpenter role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Electrician",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Electrician role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Plumber",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for the Plumber role.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "General Labourers",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for General Labourers.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Machine Operators",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Trades & Technical",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for Machine Operators.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Security Personnel",
+      company: "A Steel Construction Ltd",
+      location: "Ghana (specific site not stated)",
+      category: "Security",
+      region: "Region not stated",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A Steel Construction Ltd is recruiting qualified, motivated staff for a new construction site project in Ghana. This listing is for Security Personnel.",
+      fullDescription:
+        "**General Requirements (all site roles):**\n" +
+        "- Have experience in construction site works.\n" +
+        "- Be disciplined, reliable, and ready to work on site.\n" +
+        "- Be able to follow instructions and safety procedures.\n" +
+        "- Have good teamwork and communication skills.\n" +
+        "- Be available to start work immediately or on short notice.\n" +
+        "- Have previous construction site experience in Ghana.\n\n" +
+        "**Application Format:** Name, Position Applied For, Years of Experience, Current Location, Contact Number.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Email recruitment@asteelconstruction.com or WhatsApp +233557264512 with your CV, position applied for, and contact number.",
+      applyLink: "mailto:recruitment@asteelconstruction.com",
+      whatsappApply: "233557264512",
+      verified: true
+    },
+    {
+      title: "Virtual Assistant",
+      company: "The Hire Hub (recruiting for a client)",
+      location: "Remote",
+      category: "Admin & Office Support",
+      region: "Anywhere / Remote",
+      type: "Remote, Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "An organized and reliable Virtual Assistant is needed to provide remote administrative and operational support, via The Hire Hub.",
+      fullDescription:
+        "**Qualifications:**\n" +
+        "- Bachelor's degree or higher in Business Administration, Management, Communications, or a related field.\n" +
+        "- At least 1-2 years of experience in a similar virtual assistant or administrative support role.\n" +
+        "- Excellent communication and time management skills.\n" +
+        "- High level of attention to detail and confidentiality.\n" +
+        "- Proficiency in Microsoft Office Suite, Google Workspace, and virtual collaboration tools.\n\n" +
+        "**Responsibilities:**\n" +
+        "- Provide remote administrative and operational support.\n" +
+        "- Manage calendars, emails, and appointments.\n" +
+        "- Prepare reports, presentations, and documentation.\n" +
+        "- Conduct online research and data management.\n" +
+        "- Coordinate meetings and support day-to-day business activities.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Submit your CV and cover letter to info@thehirehub.co with the subject line \\\"Application for Virtual Assistant\\\".",
+      applyLink: "mailto:info@thehirehub.co",
+      whatsappApply: "",
+      verified: true
+    },
+    {
+      title: "Sales Associate",
+      company: "The Hire Hub (recruiting for a client)",
+      location: "Remote",
+      category: "Sales & Business Development",
+      region: "Anywhere / Remote",
+      type: "Remote, Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "A motivated, results-driven Sales Associate is needed to provide administrative and operational support to a sales team, via The Hire Hub.",
+      fullDescription:
+        "**Qualifications:**\n" +
+        "- Bachelor's degree or higher in Business Administration, Marketing, Sales, or a related field.\n" +
+        "- At least 1-2 years of experience in a similar sales support role.\n" +
+        "- Strong interpersonal and customer service skills.\n" +
+        "- Excellent organizational and analytical abilities.\n" +
+        "- Proficiency in Microsoft Office applications and CRM systems.\n\n" +
+        "**Responsibilities:**\n" +
+        "- Provide administrative and operational support to the sales team.\n" +
+        "- Prepare quotations, proposals, and sales documentation.\n" +
+        "- Maintain customer databases and sales records.\n" +
+        "- Coordinate with clients and internal departments to facilitate sales processes.\n" +
+        "- Assist in preparing sales reports and performance analyses.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Submit your CV and cover letter to info@thehirehub.co with the subject line \\\"Application for Sales Associate\\\".",
+      applyLink: "mailto:info@thehirehub.co",
+      whatsappApply: "",
+      verified: true
+    },
+    {
+      title: "Hygiene Supervisor",
+      company: "Global Talent Masters (GTM), for a manufacturing client",
+      location: "Tema",
+      category: "Manufacturing & Production",
+      region: "Greater Accra",
+      type: "Full-time",
+      salary: "GHC 7,500 - 9,000",
+      posted: "5 Jul 2026",
+      deadline: "22 Jul 2026",
+      description: "The Hygiene Supervisor plans, coordinates, and supervises hygiene and sanitation activities across an FMCG manufacturing plant in Tema, including oversight of third-party cleaning contractors.",
+      fullDescription:
+        "**Sector:** FMCG (Manufacturing) — **Reports to:** Head of HSE\n\n" +
+        "**Job Overview:** The Hygiene Supervisor is responsible for planning, coordinating, and supervising all hygiene and sanitation activities across the Plant, warehouses, utilities, and the entire factory environment. The Hygiene Supervisor will also oversee the performance of third-party cleaning contractors, ensuring cleaning activities are executed safely, effectively, and in accordance with company procedures, GMP, HACCP, FSSC 22000, and other applicable food safety standards.\n\n" +
+        "**Responsibilities:**\n" +
+        "- Develop, implement, and supervise cleaning schedules for all production areas.\n" +
+        "- Verify that sanitation activities comply with established SOPs.\n" +
+        "- Ensure cleaning chemicals are correctly used according to safety guidelines.\n" +
+        "- Supervise all outsourced cleaning personnel; monitor contractor attendance, productivity, discipline, and performance.\n" +
+        "- Conduct routine performance evaluations of third-party cleaning contractors and verify contract deliverables/SLAs are achieved.\n" +
+        "- Escalate contractor performance issues for corrective action.\n" +
+        "- Ensure compliance with GMP, HACCP, FSSC 22000 / ISO 22000.\n" +
+        "- Conduct hygiene inspections and sanitation verification; participate in internal, customer, and regulatory audits.\n" +
+        "- Implement corrective and preventive actions (CAPA) arising from audit findings.\n" +
+        "- Monitor environmental hygiene to minimize contamination risks.\n" +
+        "- Perform routine hygiene inspections before, during, and after production; monitor cleaning effectiveness.\n" +
+        "- Ensure production equipment is cleaned according to sanitation schedules.\n\n" +
+        "**Qualifications & Skills:**\n" +
+        "- Bachelor's Degree or HND in Food Science, Microbiology, Industrial Chemistry, Environmental Health, Biochemistry, Engineering, Environmental Science, or a related discipline.\n" +
+        "- 3-5 years of hygiene or sanitation experience in a food manufacturing environment.\n" +
+        "- Experience in FMCG manufacturing is an added advantage.\n" +
+        "- Experience supervising outsourced cleaning contractors is preferred.\n\n" +
+        "**Salary Package:** Net salary of GHC 7,500 - 9,000.\n\n" +
+        "**Deadline:** 22nd July, 2026.\n\n" +
+        "**To Apply:** Email CV to ransford@globaltalentmasters.com or info@globaltalentmasters.com, or WhatsApp CV to 0244 218 566.",
+      applyLink: "mailto:ransford@globaltalentmasters.com",
+      whatsappApply: "233244218566",
+      verified: true
+    },
+    {
+      title: "Sales Specialist",
+      company: "Bolt",
+      location: "Accra",
+      category: "Sales & Business Development",
+      region: "Greater Accra",
+      type: "Full-time, On-site",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "Bolt is hiring a Sales Specialist in Accra, on their Sales & Account Management team.",
+      fullDescription:
+        "**Department:** Sales & Account Management\n" +
+        "**Workplace:** On-site, Accra, Ghana\n\n" +
+        "Full role details and the application form are on Bolt's official careers page — use the Apply button below.\n\n" +
+        "**Deadline:** Not specified on the careers page.",
+      applyLink: "https://bolt.eu/en/careers/positions/d0ac7710-ab1a-4e4d-b3e6-599a0b4e95e0/?tab=apply",
+      whatsappApply: "",
+      verified: true
+    },
+    {
+      title: "Mathematics Specialist Teacher (Secondary)",
+      company: "International Community School Ghana",
+      location: "Kumasi",
+      category: "Education",
+      region: "Ashanti",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "International Community School Ghana is looking for a Mathematics Specialist Teacher for the secondary section in Kumasi.",
+      fullDescription:
+        "International Community School Ghana is looking for enthusiastic and dedicated professionals to join their team.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Submit your CV, cover letter, letter of recommendation, and contact details for two referees to hr@icsghana.info",
+      applyLink: "mailto:hr@icsghana.info",
+      whatsappApply: "",
+      verified: true
+    },
+    {
+      title: "English Specialist Teacher (Secondary)",
+      company: "International Community School Ghana",
+      location: "Kumasi",
+      category: "Education",
+      region: "Ashanti",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "International Community School Ghana is looking for an English Specialist Teacher for the secondary section in Kumasi.",
+      fullDescription:
+        "International Community School Ghana is looking for enthusiastic and dedicated professionals to join their team.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Submit your CV, cover letter, letter of recommendation, and contact details for two referees to hr@icsghana.info",
+      applyLink: "mailto:hr@icsghana.info",
+      whatsappApply: "",
+      verified: true
+    },
+    {
+      title: "Special Educational Needs Coordinator (Secondary)",
+      company: "International Community School Ghana",
+      location: "Kumasi",
+      category: "Education",
+      region: "Ashanti",
+      type: "Full-time",
+      salary: "Not stated",
+      posted: "5 Jul 2026",
+      description: "International Community School Ghana is looking for a Special Educational Needs Coordinator for the secondary section in Kumasi.",
+      fullDescription:
+        "International Community School Ghana is looking for enthusiastic and dedicated professionals to join their team.\n\n" +
+        "**Deadline:** Not specified but open until filled.\n\n" +
+        "**To Apply:** Submit your CV, cover letter, letter of recommendation, and contact details for two referees to hr@icsghana.info",
+      applyLink: "mailto:hr@icsghana.info",
+      whatsappApply: "",
+      verified: true
+    },
+    {
       title: "",
       company: "",
       location: "",
@@ -2903,6 +3492,17 @@
   function parsePostedDate(str) {
     var t = Date.parse(str);
     return isNaN(t) ? 0 : t;
+  }
+
+  // True once a job's deadline date has fully passed (end of that day).
+  // Jobs with no deadline set ("") are never treated as expired, since
+  // many postings are "rolling" or "until occupied".
+  function isExpired(job) {
+    if (!job.deadline) return false;
+    var t = Date.parse(job.deadline);
+    if (isNaN(t)) return false;
+    var endOfDeadlineDay = t + (24 * 60 * 60 * 1000) - 1;
+    return Date.now() > endOfDeadlineDay;
   }
 
   // Turns **text** into <strong>text</strong> so section labels like
@@ -2993,16 +3593,24 @@
     if (jobs[vi].title) realJobs.push(jobs[vi]);
   }
 
-  // Newest posted date first, so freshly added jobs always rise to the top.
+  // Open listings first, newest posted date first within each group — so
+  // freshly added jobs rise to the top, and anything past its deadline
+  // sinks below the still-open listings instead of needing manual removal.
   realJobs.sort(function(a, b) {
+    var aExp = isExpired(a) ? 1 : 0;
+    var bExp = isExpired(b) ? 1 : 0;
+    if (aExp !== bExp) return aExp - bExp;
     return parsePostedDate(b.posted) - parsePostedDate(a.posted);
   });
 
+  // Stats up top should reflect what's actually still open, not stale
+  // counts padded out by expired listings.
+  var openJobs = realJobs.filter(function(j) { return !isExpired(j); });
   var verifiedCount = 0;
-  for (var ci = 0; ci < realJobs.length; ci++) {
-    if (realJobs[ci].verified) verifiedCount++;
+  for (var ci = 0; ci < openJobs.length; ci++) {
+    if (openJobs[ci].verified) verifiedCount++;
   }
-  var filledCount = realJobs.length;
+  var filledCount = openJobs.length;
 
   // Builds the category/region filter button rows, with a count of how
   // many jobs match each option GIVEN the other active filters (so the
@@ -3078,6 +3686,8 @@
 
   function renderJobCard(job, indexKey) {
     var badge = job.verified ? '<span class="verified-badge">Verified by us</span>' : '';
+    var expired = isExpired(job);
+    var expiredBadge = expired ? '<span class="expired-badge">Deadline passed</span>' : '';
     var waText = encodeURIComponent('Hi, I want help applying for: ' + job.title);
     var hasFull = job.fullDescription && job.fullDescription.trim().length > 0;
     var hint = hasFull ? '<div class="expand-hint">Tap title or Apply for full details ↓</div>' : '';
@@ -3123,14 +3733,14 @@
     var saveStar = '<button id="' + starId + '" class="save-star' + (saved ? ' is-saved' : '') + '" onclick="event.stopPropagation(); toggleSaved(' + JSON.stringify(uid) + ', \'' + starId + '\')" aria-label="Save this job" title="Save this job">' + (saved ? '★' : '☆') + '</button>';
 
     return (
-      '<div class="job-card" id="' + cardId + '"' + (hasFull ? ' onclick="toggleJobCard(\'' + cardId + '\')"' : '') + '>' +
+      '<div class="job-card' + (expired ? ' job-expired' : '') + '" id="' + cardId + '"' + (hasFull ? ' onclick="toggleJobCard(\'' + cardId + '\')"' : '') + '>' +
         '<div class="job-top">' +
           '<div>' +
             '<div class="job-title">' + job.title + '</div>' +
             '<div class="job-company">' + job.company + '</div>' +
             hint +
           '</div>' +
-          '<div>' + badge + saveStar + '</div>' +
+          '<div>' + badge + expiredBadge + saveStar + '</div>' +
         '</div>' +
         '<div class="job-meta">' +
           '<span class="job-location">📍 ' + job.location + '</span>' +
