@@ -642,8 +642,8 @@
 
   /* ---- Staggered scroll reveal animations ---- */
   .reveal {
-    opacity: 1;
-    transform: translateY(0);
+    opacity: 0;
+    transform: translateY(20px);
     transition: opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1), 
                 transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   }
@@ -4415,21 +4415,6 @@
       whatsappApply: "",
       verified: true
     },
-    {
-      title: "",
-      company: "",
-      location: "",
-      category: "",
-      region: "",
-      type: "",
-      salary: "",
-      posted: "",
-      description: "",
-      fullDescription: "",
-      applyLink: "#",
-      whatsappApply: "",
-      verified: false
-    }
     // Add more jobs here, following the same { ... }, format.
   ];
 
@@ -4660,7 +4645,7 @@
     //Change Badge Display Days
     var newBadge = '';
     var postedTime = parsePostedDate(job.posted);
-    var twoeDaysAgo = Date.now() - (2 * 24 * 60 * 60 * 1000);
+    var threeDaysAgo = Date.now() - (3 * 24 * 60 * 60 * 1000);
     if (postedTime > threeDaysAgo && !expired) {
       newBadge = '<span class="new-badge">New</span>';
     }
@@ -5015,11 +5000,16 @@ function shareJob(title, company, location, encodedUid) {
         }
       });
     }, {
-      threshold: 0.08,
-      rootMargin: '0px 0px -40px 0px'
+      threshold: 0.01,
+      rootMargin: '0px 0px 0px 0px'
     });
     document.querySelectorAll('.reveal').forEach(function(el) {
       observer.observe(el);
+      // Fallback: if element is already in viewport, mark visible immediately
+      var rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight && rect.bottom > 0) {
+        el.classList.add('is-visible');
+      }
     });
   }
 
@@ -5045,8 +5035,11 @@ function shareJob(title, company, location, encodedUid) {
     var jobList = document.getElementById('jobList');
     if (jobList) jobList.classList.add('is-transitioning');
     originalRenderPage(page);
-    setTimeout(initScrollReveal, 50);
-    if (jobList) jobList.classList.remove('is-transitioning');
+    // Re-init scroll reveal after DOM updates
+    requestAnimationFrame(function() {
+      initScrollReveal();
+      if (jobList) jobList.classList.remove('is-transitioning');
+    });
   };
 
 
